@@ -15,6 +15,9 @@
     "advanced math functions"
   ],
   "canonical": "$$WebsiteURL$$/scientific-calculator",
+  "icons": {
+    "icon": "https://static.vecteezy.com/system/resources/previews/036/751/792/non_2x/3d-icon-of-calculator-electronic-device-for-calculating-mathematical-operations-accounts-gadget-for-work-and-study-isolated-object-on-a-white-background-illustration-in-an-isometric-style-vector.jpg"
+  },
   "og,twitter": {
     "title": "Scientific Calculator - $$WebsiteOwner$$",
     "description": "Solve complex mathematical operations online with $$WebsiteOwner$$ scientific calculator. Includes advanced math functions, constants, and history tracking.",
