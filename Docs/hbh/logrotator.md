@@ -1,4 +1,4 @@
-# ♻️ hbh-logrotator
+# 📦 hbh-logrotator
 
 A lightweight, extensible **JSON log rotation library for Node.js**.
 Designed for high-volume logging with **automatic file rotation**, **flat JSON logs**, or **grouped JSON logs**.

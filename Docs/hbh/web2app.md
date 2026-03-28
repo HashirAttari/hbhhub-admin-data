@@ -1,4 +1,4 @@
-# 📱 HBH-WEB2APP — Convert Any Website / HTML Folder Into Android APK
+# 🧩 HBH-WEB2APP — Convert Any Website / HTML Folder Into Android APK
 
 **HBH-WEB2APP** is a **Node.js-based Android APK generator** that converts any website, local folder, or zip archive into a full Android application — automatically.
 

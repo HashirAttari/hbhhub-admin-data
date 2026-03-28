@@ -1,4 +1,4 @@
-# 🪝 hbh-proxies
+# 🚀📦 hbh-proxies
 
 **`hbh-proxies`** is a lightweight, proxy-based utility toolkit for JavaScript and Node.js that enables **fluent, chainable APIs** for:
 
