@@ -19,7 +19,7 @@ module.exports.Injection = (meta, ctx = {}) => {
   ];
 
   rules.forEach(rule => {
-    if (rule.match()) rule.apply();
+    try { if (rule.match()) rule.apply(); } catch (e) {}
   });
 
   return updated;
