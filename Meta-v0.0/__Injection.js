@@ -1,11 +1,14 @@
 module.exports.Injection = (meta, ctx = {}) => {
   const updated = { ...meta };
+  const blockedSlugs = ['secret', 'admin', 'api']; // ⬅️ add slugs to block
 
   // 🧩 Dynamic rules
   const rules = [
+    // New blocking rule
     {
-      match: () => ctx.__slug__.includes('api'),
+      match: () => blockedSlugs.some(slug => ctx.__slug__?.startsWith(slug)),
       apply: () => {
+        updated.blocked = true;      // ⬅️ mark as blocked
         updated.robots = 'noindex, nofollow';
       }
     },
@@ -18,7 +21,7 @@ module.exports.Injection = (meta, ctx = {}) => {
   ];
 
   rules.forEach(rule => {
-    try { if (rule.match()) rule.apply(); } catch (e) {}
+    try { if (rule.match()) rule.apply(); } catch (e) { }
   });
 
   return updated;
