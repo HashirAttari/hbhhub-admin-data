@@ -1,5 +1,5 @@
 module.exports.Injection = (meta, ctx = {}) => {
-  let updated = { ...meta };
+  const updated = { ...meta };
 
   // 🧩 Dynamic rules
   const rules = [
