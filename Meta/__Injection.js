@@ -5,7 +5,7 @@ module.exports.Injection = (meta, ctx = {}) => {
   // 🧩 Dynamic rules
   const rules = [
     {
-      match: () => ctx.slug.includes('api'),
+      match: () => ctx.__slug__.includes('api'),
       apply: () => {
         updated.robots = 'noindex, nofollow';
       }
