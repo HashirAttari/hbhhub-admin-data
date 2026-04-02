@@ -1,0 +1,18 @@
+{
+  "title": "CHMOD Calculator | Linux File Permission Generator (755, 777)",
+  "description": "Easily calculate Linux file permissions with this CHMOD calculator. Convert between numeric (755, 777) and symbolic (rwxr-xr-x) formats. Perfect for developers, sysadmins, and beginners.",
+  "keywords": [
+    "chmod calculator",
+    "linux file permissions",
+    "chmod 755 meaning",
+    "chmod 777 explained",
+    "numeric to symbolic chmod",
+    "rwx permissions calculator",
+    "linux permission generator",
+    "file permission tool",
+    "chmod command generator",
+    "unix permissions calculator",
+    "developer tools chmod"
+  ],
+  "emoji_icon": "🔐"
+}

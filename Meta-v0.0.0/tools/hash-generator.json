@@ -1,0 +1,17 @@
+{
+  "title": "Hash Text Tool | Generate MD5, SHA, BLAKE & 80+ Hashes",
+  "description": "Compute hashes for any text using over 80 algorithms including MD5, SHA, BLAKE, CRC, and more. Secure, fast, and copy-ready results for developers and security enthusiasts.",
+  "keywords": [
+    "hash generator",
+    "text hashing tool",
+    "MD5 hash",
+    "SHA1 SHA256 SHA512",
+    "BLAKE hash",
+    "CRC checksum",
+    "crypto-js hashing",
+    "hash-wasm",
+    "secure hash generator",
+    "online hash tool"
+  ],
+  "emoji_icon": "🔐"
+}
