@@ -15,7 +15,7 @@ module.exports.Injection = (meta, ctx = {}) => {
     {
       match: () => ctx.__subdomain__ === 'tools',
       apply: () => {
-        updated.title = `${updated.title} 🔧`;
+        // updated.title = `${updated.title} 🔧`;
       }
     }
   ];

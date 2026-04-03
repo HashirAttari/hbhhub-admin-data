@@ -1,5 +1,5 @@
 {
-  "title": "Random Color Generator 🎨 - HEX, RGB, HSL, RGBA, HSLA",
+  "title": "Random CSS Color Generator 🌈 - HEX, RGB, HSL, RGBA, HSLA",
   "description": "Generate random colors instantly with HEX, RGB, RGBA, HSL, and HSLA formats. Copy color codes easily and adjust opacity with a slider. Perfect for designers and developers.",
   "keywords": [
     "color generator",
@@ -15,5 +15,5 @@
     "UI design",
     "frontend tools"
   ],
-  "emoji_icon": "🎨"
+  "emoji_icon": "🌈"
 }
