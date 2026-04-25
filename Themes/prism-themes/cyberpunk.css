@@ -1,0 +1,26 @@
+/* ============================= */
+/* PrismJS – Cyberpunk Neon */
+/* ============================= */
+
+:root {
+  --pr-bg: linear-gradient(180deg, hsl(260 60% 12%), hsl(240 50% 8%));
+  --pr-text: hsl(180 100% 90%);
+  --pr-border: hsl(300 100% 50% / 0.3);
+
+  --pr-inline-bg: hsl(260 40% 20%);
+  --pr-selection: hsl(300 100% 50% / 0.3);
+
+  --pr-comment: hsl(260 20% 60%);
+  --pr-keyword: hsl(300 100% 60%);
+  --pr-string: hsl(160 100% 60%);
+  --pr-number: hsl(200 100% 60%);
+  --pr-function: hsl(50 100% 60%);
+  --pr-class: hsl(330 100% 65%);
+  --pr-operator: hsl(0 100% 65%);
+
+  --pr-glow: 0 0 12px hsl(300 100% 60% / 0.4);
+}
+
+.dark {
+  --pr-bg: linear-gradient(180deg, hsl(260 60% 8%), hsl(240 50% 5%));
+}
