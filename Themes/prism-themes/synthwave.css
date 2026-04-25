@@ -1,0 +1,51 @@
+/* ============================= */
+/* PrismJS – Synthwave Theme */
+/* ============================= */
+
+/* ---------- Light ---------- */
+:root {
+  --pr-bg: linear-gradient(
+    180deg,
+    hsl(292 80% 40% / 0.25),
+    hsl(280 100% 97%) 45%
+  );
+
+  --pr-text: hsl(258 45% 20%);
+  --pr-border: hsl(292 80% 55% / 0.35);
+
+  --pr-inline-bg: hsl(280 80% 92%);
+  --pr-selection: hsl(292 100% 60% / 0.35);
+
+  --pr-comment: hsl(260 15% 45%);
+  --pr-keyword: hsl(292 90% 55%);
+  --pr-string: hsl(160 70% 45%);
+  --pr-number: hsl(195 85% 45%);
+  --pr-function: hsl(45 90% 45%);
+  --pr-class: hsl(330 80% 55%);
+  --pr-operator: hsl(0 80% 50%);
+
+  --pr-text-glow: 0 0 6px hsl(292 100% 65% / 0.25);
+  --pr-inline-shadow: 0 0 8px hsl(292 100% 60% / 0.25);
+}
+
+/* ---------- Dark ---------- */
+.dark {
+  --pr-bg: linear-gradient(
+    180deg,
+    hsl(292 80% 30% / 0.35),
+    hsl(258 45% 12%) 45%
+  );
+
+  --pr-text: hsl(280 100% 95%);
+  --pr-border: hsl(292 80% 40% / 0.35);
+
+  --pr-comment: hsl(260 20% 65%);
+  --pr-keyword: hsl(292 100% 70%);
+  --pr-string: hsl(160 100% 65%);
+  --pr-number: hsl(195 100% 65%);
+  --pr-function: hsl(50 100% 65%);
+  --pr-class: hsl(330 100% 70%);
+  --pr-operator: hsl(0 100% 70%);
+
+  --pr-text-glow: 0 0 12px hsl(292 100% 65% / 0.35);
+}
