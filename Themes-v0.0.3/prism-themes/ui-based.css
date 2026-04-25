@@ -1,0 +1,53 @@
+/* ============================= */
+/* PrismJS – YouTube Theme */
+/* ============================= */
+
+/* ---------- Light ---------- */
+:root {
+  --pr-bg: linear-gradient(
+    180deg,
+    hsl(220 13% 96%),
+    hsl(0 0% 100%) 60%
+  );
+
+  --pr-text: hsl(222 15% 15%);
+  --pr-border: hsl(220 13% 85%);
+
+  --pr-inline-bg: hsl(220 14% 92%);
+  --pr-selection: hsl(221 83% 53% / 0.25);
+
+  --pr-comment: hsl(220 10% 45%);
+  --pr-keyword: hsl(221 83% 53%);
+  --pr-string: hsl(142 55% 40%);
+  --pr-number: hsl(217 91% 50%);
+  --pr-function: hsl(43 96% 50%);
+  --pr-class: hsl(197 80% 45%);
+  --pr-operator: hsl(0 70% 50%);
+
+  --pr-glow: 0 0 8px rgba(37, 99, 235, 0.15);
+}
+
+/* ---------- Dark ---------- */
+.dark {
+  --pr-bg: linear-gradient(
+    180deg,
+    hsl(222 47% 11%),
+    hsl(222 47% 7%) 70%
+  );
+
+  --pr-text: hsl(210 40% 96%);
+  --pr-border: hsl(217 19% 27%);
+
+  --pr-inline-bg: hsl(217 19% 20%);
+  --pr-selection: rgba(59, 130, 246, 0.35);
+
+  --pr-comment: hsl(215 15% 65%);
+  --pr-keyword: hsl(217 91% 65%);
+  --pr-string: hsl(142 70% 60%);
+  --pr-number: hsl(217 91% 70%);
+  --pr-function: hsl(43 96% 65%);
+  --pr-class: hsl(197 80% 70%);
+  --pr-operator: hsl(0 80% 65%);
+
+  --pr-glow: 0 0 14px rgba(59, 130, 246, 0.25);
+}
