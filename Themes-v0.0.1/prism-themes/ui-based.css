@@ -3,7 +3,7 @@
 /* ============================= */
 
 :root {
-  --pr-bg: hsl(var(--secondary));
+  --pr-bg: hsl(var(--card));
   --pr-text: hsl(var(--foreground));
   --pr-border: hsl(var(--border));
 
@@ -22,7 +22,7 @@
 }
 
 .dark {
-  --pr-bg: hsl(var(--secondary));
+  --pr-bg: hsl(var(--card));
   --pr-text: hsl(var(--foreground));
   --pr-border: hsl(var(--border));
 
