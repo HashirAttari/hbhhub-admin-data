@@ -22,6 +22,13 @@
 }
 
 .dark {
+  --pr-bg: hsl(var(--secondary));
+  --pr-text: hsl(var(--foreground));
+  --pr-border: hsl(var(--border));
+
+  --pr-inline-bg: hsl(var(--accent));
+  --pr-selection: hsl(var(--primary) / 0.25);
+
   --pr-number: hsl(217 91% 65%);
   --pr-function: hsl(43 96% 65%);
   --pr-class: hsl(197 71% 70%);
