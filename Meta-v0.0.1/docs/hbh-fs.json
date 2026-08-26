@@ -1,0 +1,17 @@
+{
+  "title": "HBH FS 📁",
+  "description": "A lightweight and modern Node.js filesystem utility library for managing files and directories with recursive operations, JSON helpers, directory listings, exclusions, and text replacement tools.",
+  "keyword": [
+    "Node.js filesystem",
+    "file system utilities",
+    "fs helper",
+    "file management",
+    "directory management",
+    "JSON file utilities",
+    "recursive file operations",
+    "directory listing",
+    "file utilities",
+    "Node.js tools"
+  ],
+  "emoji_icon": "📁"
+}

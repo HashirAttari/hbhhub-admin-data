@@ -1,0 +1,32 @@
+{
+  "title": "HBH-DBMS 📦",
+  "description": "A scalable, chunk-based, file-oriented database management system for Node.js with deterministic paths, hierarchical storage, safe filesystem traversal, JSON data management, CRUD operations, content handling, user files, pagination, and CMS-ready utilities without external database dependencies.",
+  "keyword": [
+    "Node.js database",
+    "file-based database",
+    "file-based DBMS",
+    "JSON database",
+    "filesystem database",
+    "Node.js DBMS",
+    "scalable file storage",
+    "chunk-based storage",
+    "hierarchical database",
+    "filesystem storage",
+    "database management system",
+    "Node.js file storage",
+    "CMS database",
+    "content management system",
+    "user file management",
+    "CRUD database",
+    "deterministic paths",
+    "safe filesystem traversal",
+    "pagination",
+    "content search",
+    "database without MongoDB",
+    "database without MySQL",
+    "ESM Node.js database",
+    "CMS backend",
+    "SaaS backend"
+  ],
+  "emoji_icon": "📦"
+}

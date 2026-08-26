@@ -1,0 +1,19 @@
+{
+  "title": "hbh-ccl 🧩",
+  "description": "A lightweight and flexible ESM-only configuration loader for Node.js that automatically finds user configs, supports default fallbacks, deep merging, and async loading with minimal overhead.",
+  "keyword": [
+    "Node.js config loader",
+    "ESM config loader",
+    "configuration loader",
+    "custom config",
+    "default config",
+    "config fallback",
+    "deep merge",
+    "async config loader",
+    "Node.js utilities",
+    "ESM-only package",
+    "JavaScript configuration",
+    "npm package"
+  ],
+  "emoji_icon": "🧩"
+}

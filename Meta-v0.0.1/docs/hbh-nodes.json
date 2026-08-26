@@ -1,0 +1,22 @@
+{
+  "title": "HBH Nodes 🧰",
+  "description": "A collection of lightweight Node.js utilities for JSON management, glob matching, project-to-Markdown conversion, package management, data sanitization, string compression, timing, string-array management, and CLI development.",
+  "keyword": [
+    "Node.js",
+    "developer utilities",
+    "JSON manager",
+    "glob matching",
+    "micromatch",
+    "project to markdown",
+    "package manager",
+    "data sanitization",
+    "string compression",
+    "performance timing",
+    "string array manager",
+    "undo redo",
+    "CLI utilities",
+    "command line tools",
+    "developer tools"
+  ],
+  "emoji_icon": "🧰"
+}

@@ -1,0 +1,30 @@
+{
+  "title": "hbh-deve 🚀",
+  "description": "A flexible SSR view engine and dynamic file-based route loader for Express.js with support for Pug, HTML, Markdown, and JavaScript views, live reload, layouts, dynamic routing, frontmatter, middleware, and developer-friendly tooling.",
+  "keyword": [
+    "Express SSR",
+    "Express view engine",
+    "SSR view engine",
+    "file-based routing",
+    "dynamic Express routes",
+    "Express route loader",
+    "Pug SSR",
+    "HTML templates",
+    "Markdown SSR",
+    "JavaScript views",
+    "live reload",
+    "Express live reload",
+    "dynamic routing",
+    "file-based Express routing",
+    "Express layouts",
+    "Pug layouts",
+    "frontmatter",
+    "Express middleware",
+    "server-side rendering",
+    "Node.js SSR",
+    "Express.js tools",
+    "developer tools",
+    "template engine"
+  ],
+  "emoji_icon": "🚀"
+}

@@ -1,0 +1,18 @@
+{
+  "title": "HBH Log Rotator 🔄",
+  "description": "A lightweight and extensible Node.js JSON log rotation library with automatic entry- or time-based rotation, flat and grouped JSON formats, streaming writes, and support for custom log rotators.",
+  "keyword": [
+    "Node.js log rotation",
+    "JSON logging",
+    "log file rotation",
+    "structured logging",
+    "event-based logging",
+    "file-based logging",
+    "log rotator",
+    "JSON logger",
+    "audit logs",
+    "server logging",
+    "lightweight logger"
+  ],
+  "emoji_icon": "🔄"
+}

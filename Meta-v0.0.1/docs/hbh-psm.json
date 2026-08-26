@@ -1,0 +1,20 @@
+{
+  "title": "HBH Project Structure Maker 🏗️",
+  "description": "A flexible Node.js project scaffolding and generation tool for creating custom folder and file structures with templating, dry-run previews, conditional generation, backups, append mode, ignore patterns, callbacks, and verbose logging.",
+  "keyword": [
+    "Node.js project generator",
+    "project scaffolding",
+    "project structure generator",
+    "boilerplate generator",
+    "project template",
+    "file structure generator",
+    "Node.js scaffolding tool",
+    "template variables",
+    "dry-run project generation",
+    "file backup",
+    "conditional generation",
+    "project automation",
+    "text tree parser"
+  ],
+  "emoji_icon": "🏗️"
+}
