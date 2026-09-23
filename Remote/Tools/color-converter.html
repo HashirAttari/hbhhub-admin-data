@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Color Converter</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:hsl(var(--background));color:hsl(var(--foreground))}button,input{font:inherit}button{cursor:pointer}.app{width:min(1050px,100%);margin:auto;padding:clamp(18px,4vw,42px) clamp(12px,4vw,28px)}.hero{margin-bottom:22px}.eyebrow{display:inline-flex;align-items:center;gap:7px;color:hsl(var(--primary));font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em}.eyebrow i{width:7px;height:7px;border-radius:50%;background:hsl(var(--primary))}.hero h1{font-size:clamp(29px,5vw,43px);line-height:1.05;letter-spacing:-.04em;margin:8px 0}.hero p{margin:0;max-width:700px;color:hsl(var(--muted-foreground));font-size:14px;line-height:1.6}.panel{background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:calc(var(--radius) + 6px);box-shadow:0 15px 45px hsl(var(--foreground)/.06);overflow:hidden}.top{display:grid;grid-template-columns:330px minmax(0,1fr);min-height:420px}.picker{padding:22px;border-right:1px solid hsl(var(--border))}.preview{padding:22px;display:flex;flex-direction:column;gap:18px}.swatch{height:190px;border-radius:calc(var(--radius) + 4px);border:1px solid hsl(var(--border));background:#6366f1;box-shadow:inset 0 0 0 1px hsl(var(--foreground)/.05)}.label{font-size:12px;font-weight:800;margin:18px 0 8px}.color-input{width:100%;height:54px;padding:4px;border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--background));cursor:pointer}.field{display:flex;align-items:center;gap:8px}.field input[type=text]{min-width:0;flex:1;width:100%;padding:12px;border:1px solid hsl(var(--input));background:hsl(var(--background));color:hsl(var(--foreground));border-radius:var(--radius);outline:none;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;text-transform:uppercase}.field input:focus{border-color:hsl(var(--ring));box-shadow:0 0 0 3px hsl(var(--ring)/.12)}.btn{border:1px solid hsl(var(--border));background:hsl(var(--secondary));color:hsl(var(--secondary-foreground));padding:10px 14px;border-radius:calc(var(--radius) - 2px);font-size:12px;font-weight:800;transition:.15s;white-space:nowrap}.btn:hover{filter:brightness(.97)}.btn.primary{background:hsl(var(--primary));color:hsl(var(--primary-foreground));border-color:hsl(var(--primary))}.btn:disabled{opacity:.45;cursor:not-allowed}.hint{font-size:10px;color:hsl(var(--muted-foreground));line-height:1.45;margin-top:7px}.formats{display:flex;flex-wrap:wrap;gap:7px}.format{flex:1 1 120px;min-width:0;padding:13px;border:1px solid hsl(var(--border));background:hsl(var(--background));border-radius:var(--radius)}.format strong{display:block;font-size:11px;margin-bottom:4px}.format span{display:block;color:hsl(var(--muted-foreground));font:10px ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all}.format button{margin-top:8px;width:100%}.result-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.result{border:1px solid hsl(var(--border));border-radius:var(--radius);padding:13px;background:hsl(var(--background)/.45);min-width:0}.result-top{display:flex;justify-content:space-between;align-items:center;gap:8px}.result-name{font-size:11px;font-weight:800;color:hsl(var(--muted-foreground))}.result-value{margin-top:8px;font:13px ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all}.mini{padding:5px 8px;font-size:10px}.section-title{font-size:12px;font-weight:800}.alpha-row{display:grid;grid-template-columns:1fr 75px;gap:10px;align-items:center}.alpha-row input[type=range]{width:100%;accent-color:hsl(var(--primary))}.alpha-value{text-align:right;font:11px ui-monospace,SFMono-Regular,Menlo,monospace;color:hsl(var(--muted-foreground))}.history{border-top:1px solid hsl(var(--border));padding:18px 22px}.history-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.history-list{display:flex;gap:8px;flex-wrap:wrap}.history-item{display:flex;align-items:center;gap:7px;border:1px solid hsl(var(--border));background:hsl(var(--background));border-radius:999px;padding:5px 9px 5px 6px;font:10px ui-monospace,SFMono-Regular,Menlo,monospace;cursor:pointer}.history-dot{width:20px;height:20px;border-radius:50%;border:1px solid hsl(var(--border))}.empty-history{font-size:11px;color:hsl(var(--muted-foreground))}.error{display:none;margin-top:10px;padding:10px;border:1px solid hsl(var(--primary)/.3);background:hsl(var(--primary)/.06);border-radius:var(--radius);font-size:11px;line-height:1.4}.error.show{display:block}.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,12px);opacity:0;pointer-events:none;background:hsl(var(--foreground));color:hsl(var(--background));padding:9px 13px;border-radius:999px;font-size:11px;font-weight:750;transition:.2s;z-index:10}.toast.show{opacity:1;transform:translate(-50%,0)}@media(max-width:800px){.top{grid-template-columns:1fr}.picker{border-right:0;border-bottom:1px solid hsl(var(--border))}.swatch{height:220px}}@media(max-width:520px){.app{padding:17px 10px}.picker,.preview,.history{padding:15px}.result-grid{grid-template-columns:1fr}.swatch{height:180px}.field{align-items:stretch;flex-direction:column}.field .btn{width:100%}.color-input{height:52px}.alpha-row{grid-template-columns:1fr 60px}} 
+</style>
+</head>
+<body>
+<main class="app">
+<section class="hero">
+<div class="eyebrow"><i></i> Color utility</div>
+<h1>Color Converter.</h1>
+<p>Convert colors instantly between HEX, RGB, HSL, HSV, CMYK and CSS formats. Pick a color, paste a value, adjust alpha, and copy any result.</p>
+</section>
+
+<section class="panel">
+<div class="top">
+<div class="picker">
+<div class="swatch" id="swatch"></div>
+<div class="label">Color picker</div>
+<input class="color-input" id="picker" type="color" value="#6366f1">
+
+<div class="label">Enter a color</div>
+<div class="field">
+<input id="input" type="text" value="#6366F1" placeholder="#6366F1, rgb(99,102,241), hsl(...)">
+<button class="btn primary" id="apply" type="button">Apply</button>
+</div>
+<div class="hint">Accepted: HEX, RGB/RGBA, HSL/HSLA, HSV/HSB and common CSS color names.</div>
+
+<div class="error" id="error"></div>
+
+<div class="label">Alpha</div>
+<div class="alpha-row">
+<input id="alpha" type="range" min="0" max="100" value="100">
+<div class="alpha-value" id="alphaValue">100%</div>
+</div>
+</div>
+
+<div class="preview">
+<div class="section-title">Converted values</div>
+<div class="result-grid" id="results"></div>
+
+<div class="section-title" style="margin-top:2px">CSS-ready formats</div>
+<div class="formats">
+<div class="format"><strong>HEX</strong><span id="hexCode">#6366F1</span><button class="btn mini" data-copy="hexCode" type="button">Copy</button></div>
+<div class="format"><strong>RGB</strong><span id="rgbCode">rgb(99, 102, 241)</span><button class="btn mini" data-copy="rgbCode" type="button">Copy</button></div>
+<div class="format"><strong>HSL</strong><span id="hslCode">hsl(239, 84%, 67%)</span><button class="btn mini" data-copy="hslCode" type="button">Copy</button></div>
+<div class="format"><strong>RGBA</strong><span id="rgbaCode">rgba(99, 102, 241, 1)</span><button class="btn mini" data-copy="rgbaCode" type="button">Copy</button></div>
+</div>
+</div>
+</div>
+
+<div class="history">
+<div class="history-head">
+<div class="section-title">Recent colors</div>
+<button class="btn mini" id="clearHistory" type="button">Clear</button>
+</div>
+<div class="history-list" id="history"></div>
+</div>
+</section>
+
+<div class="toast" id="toast">Copied</div>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const picker=$("picker"),input=$("input"),apply=$("apply"),swatch=$("swatch"),alpha=$("alpha"),alphaValue=$("alphaValue"),results=$("results"),error=$("error"),historyEl=$("history"),toast=$("toast");
+
+let color={r:255,g:0,b:0,a:.50};
+let history=JSON.parse(localStorage.getItem("color-converter-history")||"[]");
+
+const names={
+transparent:[0,0,0,0],black:[0,0,0],silver:[192,192,192],gray:[128,128,128],white:[255,255,255],
+maroon:[128,0,0],red:[255,0,0],purple:[128,0,128],fuchsia:[255,0,255],green:[0,128,0],
+lime:[0,255,0],olive:[128,128,0],yellow:[255,255,0],navy:[0,0,128],blue:[0,0,255],
+teal:[0,128,128],aqua:[0,255,255],orange:[255,165,0],aliceblue:[240,248,255],
+rebeccapurple:[102,51,153],pink:[255,192,203],brown:[165,42,42],cyan:[0,255,255],
+magenta:[255,0,255]
+};
+
+function clamp(n,min=0,max=255){return Math.min(max,Math.max(min,n))}
+function round(n){return Math.round(n*100)/100}
+function cleanNum(v){return Number.isInteger(v)?String(v):String(round(v))}
+function hex2(n){return Math.round(n).toString(16).padStart(2,"0").toUpperCase()}
+
+function rgbToHex(r,g,b){return "#"+hex2(r)+hex2(g)+hex2(b)}
+
+function rgbToHsl(r,g,b){
+r/=255;g/=255;b/=255;
+const max=Math.max(r,g,b),min=Math.min(r,g,b);
+let h=0,s=0,l=(max+min)/2;
+if(max!==min){
+const d=max-min;
+s=l>.5?d/(2-max-min):d/(max+min);
+switch(max){
+case r:h=(g-b)/d+(g<b?6:0);break;
+case g:h=(b-r)/d+2;break;
+default:h=(r-g)/d+4;
+}
+h/=6;
+}
+return{h:h*360,s:s*100,l:l*100};
+}
+
+function rgbToHsv(r,g,b){
+r/=255;g/=255;b/=255;
+const max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;
+let h=0;
+if(d){
+switch(max){
+case r:h=((g-b)/d)%6;break;
+case g:h=(b-r)/d+2;break;
+default:h=(r-g)/d+4;
+}
+h*=60;if(h<0)h+=360;
+}
+const s=max===0?0:d/max;
+return{h,s:s*100,v:max*100};
+}
+
+function rgbToCmyk(r,g,b){
+r/=255;g/=255;b/=255;
+const k=1-Math.max(r,g,b);
+if(k===1)return{c:0,m:0,y:0,k:100};
+return{c:(1-r-k)/(1-k)*100,m:(1-g-k)/(1-k)*100,y:(1-b-k)/(1-k)*100,k:k*100};
+}
+
+function parseHsl(str){
+const m=str.match(/^hsla?\(\s*([+-]?\d+(?:\.\d+)?)\s*(?:deg)?\s*[,\/]\s*([+-]?\d+(?:\.\d+)?)%\s*[,\/]\s*([+-]?\d+(?:\.\d+)?)%(?:\s*[,\/]\s*([+-]?\d*\.?\d+%?))?\s*\)$/i);
+if(!m)return null;
+let h=((+m[1]%360)+360)%360,s=clamp(+m[2],0,100)/100,l=clamp(+m[3],0,100)/100;
+let c=(1-Math.abs(2*l-1))*s,x=c*(1-Math.abs((h/60)%2-1)),q=0;
+let r=0,g=0,b=0;
+if(h<60)[r,g,b]=[c,x,0];else if(h<120)[r,g,b]=[x,c,0];else if(h<180)[r,g,b]=[0,c,x];else if(h<240)[r,g,b]=[0,x,c];else if(h<300)[r,g,b]=[x,0,c];else[r,g,b]=[c,0,x];
+const mm=l-c/2;
+return{r:Math.round((r+mm)*255),g:Math.round((g+mm)*255),b:Math.round((b+mm)*255),a:parseAlpha(m[4])};
+}
+
+function parseRgb(str){
+const m=str.match(/^rgba?\(\s*([+-]?\d*\.?\d+%?)\s*[,\/]\s*([+-]?\d*\.?\d+%?)\s*[,\/]\s*([+-]?\d*\.?\d+%?)(?:\s*[,\/]\s*([+-]?\d*\.?\d+%?))?\s*\)$/i);
+if(!m)return null;
+const cv=v=>v.endsWith("%")?clamp(parseFloat(v)*2.55):clamp(parseFloat(v));
+return{r:Math.round(cv(m[1])),g:Math.round(cv(m[2])),b:Math.round(cv(m[3])),a:parseAlpha(m[4])};
+}
+
+function parseAlpha(v){
+if(v==null||v==="")return 1;
+return clamp(v.endsWith("%")?parseFloat(v)/100:parseFloat(v),0,1);
+}
+
+function parseColor(str){
+str=str.trim().toLowerCase();
+if(names[str]){
+const n=names[str];
+return{r:n[0],g:n[1],b:n[2],a:n.length>3?n[3]:1};
+}
+if(/^#([0-9a-f]{3,8})$/i.test(str)){
+let h=str.slice(1);
+if(h.length===3)h=h.split("").map(x=>x+x).join("");
+if(h.length===4)h=h.split("").map(x=>x+x).join("");
+if(h.length===6||h.length===8)return{r:parseInt(h.slice(0,2),16),g:parseInt(h.slice(2,4),16),b:parseInt(h.slice(4,6),16),a:h.length===8?parseInt(h.slice(6,8),16)/255:1};
+}
+return parseRgb(str)||parseHsl(str);
+}
+
+function setColor(c,save=true){
+color={r:clamp(c.r),g:clamp(c.g),b:clamp(c.b),a:clamp(c.a,0,1)};
+const hex=rgbToHex(color.r,color.g,color.b);
+picker.value=hex;
+input.value=hex;
+alpha.value=Math.round(color.a*100);
+alphaValue.textContent=Math.round(color.a*100)+"%";
+render();
+if(save)addHistory(hex);
+}
+
+function render(){
+const{r,g,b,a}=color;
+const h=rgbToHsl(r,g,b),v=rgbToHsv(r,g,b),k=rgbToCmyk(r,g,b);
+const hex=rgbToHex(r,g,b);
+const rgba=`rgba(${r}, ${g}, ${b}, ${round(a)})`;
+const hsl=`hsl(${Math.round(h.h)}, ${Math.round(h.s)}%, ${Math.round(h.l)}%)`;
+
+swatch.style.background=`rgba(${r},${g},${b},${a})`;
+
+$("hexCode").textContent=hex+(a<1?hex2(a*255):"");
+$("rgbCode").textContent=`rgb(${r}, ${g}, ${b})`;
+$("hslCode").textContent=hsl;
+$("rgbaCode").textContent=rgba;
+
+const values=[
+["HEX",hex+(a<1?hex2(a*255):"")],
+["RGB",`${r}, ${g}, ${b}`],
+["HSL",`${Math.round(h.h)}°, ${Math.round(h.s)}%, ${Math.round(h.l)}%`],
+["HSV",`${Math.round(v.h)}°, ${Math.round(v.s)}%, ${Math.round(v.v)}%`],
+["CMYK",`${Math.round(k.c)}%, ${Math.round(k.m)}%, ${Math.round(k.y)}%, ${Math.round(k.k)}%`],
+["Alpha",`${Math.round(a*100)}%`]
+];
+
+results.innerHTML=values.map(([n,val])=>`
+<div class="result">
+<div class="result-top">
+<span class="result-name">${n}</span>
+<button class="btn mini copy-result" data-value="${encodeURIComponent(val)}" type="button">Copy</button>
+</div>
+<div class="result-value">${val}</div>
+</div>`).join("");
+
+results.querySelectorAll(".copy-result").forEach(btn=>btn.onclick=()=>{
+copyText(decodeURIComponent(btn.dataset.value));
+});
+
+renderHistory();
+}
+
+function addHistory(hex){
+history=[hex,...history.filter(x=>x!==hex)].slice(0,12);
+localStorage.setItem("color-converter-history",JSON.stringify(history));
+renderHistory();
+}
+
+function renderHistory(){
+if(!history.length){
+historyEl.innerHTML='<span class="empty-history">Your recent colors will appear here.</span>';
+return;
+}
+historyEl.innerHTML=history.map(hex=>`
+<button class="history-item" type="button" data-hex="${hex}">
+<span class="history-dot" style="background:${hex}"></span>${hex}
+</button>`).join("");
+historyEl.querySelectorAll(".history-item").forEach(btn=>btn.onclick=()=>{
+const c=parseColor(btn.dataset.hex);
+if(c)setColor(c,false);
+});
+}
+
+function copyText(text){
+if(navigator.clipboard){
+navigator.clipboard.writeText(text).then(showToast).catch(()=>fallbackCopy(text));
+}else fallbackCopy(text);
+}
+
+function fallbackCopy(text){
+const t=document.createElement("textarea");
+t.value=text;
+document.body.appendChild(t);
+t.select();
+document.execCommand("copy");
+t.remove();
+showToast();
+}
+
+let toastTimer;
+function showToast(){
+toast.classList.add("show");
+clearTimeout(toastTimer);
+toastTimer=setTimeout(()=>toast.classList.remove("show"),1300);
+}
+
+apply.onclick=()=>{
+const c=parseColor(input.value);
+if(!c){
+error.textContent="Invalid color. Try a HEX value such as #6366F1, rgb(99,102,241), or hsl(239,84%,67%).";
+error.classList.add("show");
+return;
+}
+error.classList.remove("show");
+setColor(c);
+};
+
+input.addEventListener("keydown",e=>{
+if(e.key==="Enter")apply.click();
+});
+
+picker.oninput=()=>{
+const c=parseColor(picker.value);
+if(c)setColor(c);
+};
+
+alpha.oninput=()=>{
+color.a=Number(alpha.value)/100;
+alphaValue.textContent=alpha.value+"%";
+render();
+};
+
+document.querySelectorAll("[data-copy]").forEach(btn=>btn.onclick=()=>{
+copyText($(btn.dataset.copy).textContent);
+});
+
+$("clearHistory").onclick=()=>{
+history=[];
+localStorage.removeItem("color-converter-history");
+renderHistory();
+};
+
+setColor(color);
+</script>
+</body>
+</html>

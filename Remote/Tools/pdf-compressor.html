@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PDF Compressor</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:hsl(var(--background));color:hsl(var(--foreground))}button,input,select{font:inherit}.app{width:min(1080px,100%);margin:auto;padding:clamp(18px,4vw,42px) clamp(12px,4vw,28px)}.hero{margin-bottom:22px}.eyebrow{display:inline-flex;align-items:center;gap:7px;color:hsl(var(--primary));font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em}.eyebrow i{width:7px;height:7px;border-radius:50%;background:hsl(var(--primary))}.hero h1{font-size:clamp(29px,5vw,43px);line-height:1.05;letter-spacing:-.04em;margin:8px 0}.hero p{margin:0;max-width:700px;color:hsl(var(--muted-foreground));font-size:14px;line-height:1.6}.panel{background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:calc(var(--radius) + 6px);box-shadow:0 15px 45px hsl(var(--foreground)/.06);overflow:hidden}.drop{margin:18px;border:2px dashed hsl(var(--border));border-radius:var(--radius);padding:clamp(30px,7vw,58px) 18px;text-align:center;transition:.2s}.drop.drag{border-color:hsl(var(--primary));background:hsl(var(--primary)/.07)}.icon{width:54px;height:54px;margin:0 auto 14px;border-radius:16px;background:hsl(var(--primary)/.1);color:hsl(var(--primary));display:grid;place-items:center;font-size:25px}.drop h2{margin:0 0 6px;font-size:19px}.drop p{margin:0 0 17px;color:hsl(var(--muted-foreground));font-size:13px}.btn{border:1px solid hsl(var(--border));background:hsl(var(--secondary));color:hsl(var(--secondary-foreground));padding:10px 16px;border-radius:calc(var(--radius) - 2px);font-weight:750;font-size:13px;cursor:pointer;transition:.15s}.btn:hover{filter:brightness(.97)}.btn.primary{background:hsl(var(--primary));color:hsl(var(--primary-foreground));border-color:hsl(var(--primary))}.btn:disabled{opacity:.5;cursor:not-allowed}.body{display:none;padding:0 18px 18px}.body.show{display:block}.file{display:flex;align-items:center;gap:12px;border:1px solid hsl(var(--border));border-radius:var(--radius);padding:13px}.pdf{width:40px;height:44px;flex:0 0 40px;background:hsl(var(--primary));color:hsl(var(--primary-foreground));border-radius:8px;display:grid;place-items:center;font-size:10px;font-weight:900}.filemain{min-width:0;flex:1}.fname{font-size:14px;font-weight:750;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.meta{font-size:12px;color:hsl(var(--muted-foreground));margin-top:3px}.x{border:0;background:transparent;color:hsl(var(--muted-foreground));font-size:22px;width:34px;height:34px;border-radius:8px;cursor:pointer}.x:hover{background:hsl(var(--secondary));color:hsl(var(--foreground))}.settings{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:13px}.box{border:1px solid hsl(var(--border));border-radius:var(--radius);padding:15px}.box h3{font-size:13px;margin:0}.box p{font-size:12px;color:hsl(var(--muted-foreground));margin:4px 0 13px;line-height:1.45}.select{width:100%;padding:10px;border:1px solid hsl(var(--input));background:hsl(var(--background));color:hsl(var(--foreground));border-radius:calc(var(--radius) - 2px);outline:none}.quality{display:grid;grid-template-columns:1fr auto;gap:10px}.quality button{min-width:0}.mode{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.mode button{padding:9px 6px;font-size:12px}.mode button.active{background:hsl(var(--primary));color:hsl(var(--primary-foreground));border-color:hsl(var(--primary))}.run{margin-top:14px;display:flex;justify-content:flex-end}.progress{display:none;margin-top:14px}.progress.show{display:block}.ptop{display:flex;justify-content:space-between;font-size:12px;font-weight:750;margin-bottom:7px}.track{height:7px;border-radius:20px;background:hsl(var(--secondary));overflow:hidden}.track i{display:block;height:100%;width:0;background:hsl(var(--primary));transition:width .25s}.status{margin-top:7px;font-size:11px;color:hsl(var(--muted-foreground))}.result{display:none;margin-top:14px;border:1px solid hsl(var(--success)/.35);background:hsl(var(--success)/.07);border-radius:var(--radius);padding:15px}.result.show{display:block}.rgrid{display:grid;grid-template-columns:1fr auto;gap:15px;align-items:center}.result h3{margin:0;font-size:14px}.result p{margin:5px 0 0;color:hsl(var(--muted-foreground));font-size:12px;line-height:1.5}.saved{color:hsl(var(--success));font-weight:850}.error{display:none;margin-top:14px;border:1px solid hsl(var(--primary)/.3);background:hsl(var(--primary)/.06);border-radius:var(--radius);padding:13px;font-size:12px;line-height:1.5}.error.show{display:block}.loader{display:inline-block;width:12px;height:12px;border:2px solid hsl(var(--primary)/.25);border-top-color:hsl(var(--primary));border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:7px}@keyframes spin{to{transform:rotate(360deg)}}.note{text-align:center;color:hsl(var(--muted-foreground));font-size:11px;line-height:1.55;margin:15px auto 0;max-width:760px}@media(max-width:650px){.settings{grid-template-columns:1fr}.rgrid{grid-template-columns:1fr}.rgrid .btn{width:100%}.run .btn{width:100%}}@media(max-width:420px){.app{padding:17px 10px}.drop{margin:10px;padding:29px 13px}.body{padding:0 10px 10px}.file{padding:11px}.mode{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="app">
+<section class="hero">
+<div class="eyebrow"><i></i> Local PDF compressor</div>
+<h1>Make your PDF smaller.</h1>
+<p>Real PDF recompression powered by Ghostscript WebAssembly. Your file is processed in your browser instead of being uploaded to a server.</p>
+</section>
+
+<section class="panel">
+<div class="drop" id="drop">
+<div class="icon">↑</div>
+<h2>Drop your PDF here</h2>
+<p>or choose a PDF from your device · maximum 100 MB</p>
+<button class="btn primary" id="choose" type="button">Choose PDF</button>
+<input id="input" type="file" accept=".pdf,application/pdf" hidden>
+</div>
+
+<div class="body" id="body">
+<div class="file">
+<div class="pdf">PDF</div>
+<div class="filemain">
+<div class="fname" id="fname"></div>
+<div class="meta" id="fmeta"></div>
+</div>
+<button class="x" id="remove" type="button" aria-label="Remove PDF">×</button>
+</div>
+
+<div class="settings">
+<div class="box">
+<h3>Compression level</h3>
+<p>Choose how aggressively Ghostscript should optimize images, streams and resources.</p>
+<div class="mode">
+<button class="btn" data-mode="screen" type="button">Maximum</button>
+<button class="btn active" data-mode="ebook" type="button">Recommended</button>
+<button class="btn" data-mode="printer" type="button">High quality</button>
+</div>
+</div>
+
+<div class="box">
+<h3>Processing</h3>
+<p>The first compression may take a little longer while the PDF engine loads.</p>
+<div id="engineStatus" style="font-size:13px;font-weight:750"><span class="loader"></span>Engine not loaded</div>
+<div style="margin-top:8px;color:hsl(var(--muted-foreground));font-size:11px">The WASM engine is downloaded once and then reused by this page.</div>
+</div>
+</div>
+
+<div class="run">
+<button class="btn primary" id="compress" type="button">Compress PDF</button>
+</div>
+
+<div class="progress" id="progress">
+<div class="ptop"><span id="pct">0%</span><span id="stage">Preparing…</span></div>
+<div class="track"><i id="bar"></i></div>
+<div class="status" id="status"></div>
+</div>
+
+<div class="result" id="result">
+<div class="rgrid">
+<div>
+<h3 id="rtitle">Compression complete</h3>
+<p id="rmeta"></p>
+</div>
+<button class="btn primary" id="download" type="button">Download compressed PDF</button>
+</div>
+</div>
+
+<div class="error" id="error"></div>
+</div>
+</section>
+
+<div class="note">Real compression results depend on the PDF. Scanned/image-heavy PDFs can shrink dramatically; text/vector PDFs may have much smaller reductions.</div>
+</main>
+
+<script type="module">
+const CDN="https://cdn.jsdelivr.net/npm/@jspawn/ghostscript-wasm@0.0.2/";
+let gs=null,file=null,output=null,outputName="",selectedMode="ebook",loading=null;
+
+const $=id=>document.getElementById(id);
+const input=$("input"),choose=$("choose"),drop=$("drop"),body=$("body"),fname=$("fname"),fmeta=$("fmeta"),remove=$("remove"),compress=$("compress"),progress=$("progress"),bar=$("bar"),pct=$("pct"),stage=$("stage"),status=$("status"),result=$("result"),rtitle=$("rtitle"),rmeta=$("rmeta"),download=$("download"),errorBox=$("error"),engineStatus=$("engineStatus");
+
+const fmt=n=>n<1024?n+" B":n<1048576?(n/1024).toFixed(1)+" KB":(n/1048576).toFixed(2)+" MB";
+
+function error(msg){
+ errorBox.textContent=msg;
+ errorBox.classList.add("show");
+}
+function clearError(){errorBox.classList.remove("show");errorBox.textContent=""}
+
+function setFile(f){
+ if(!f)return;
+ if(f.type!=="application/pdf"&&!/\.pdf$/i.test(f.name))return error("Please select a valid PDF file.");
+ if(f.size>100*1024*1024)return error("This PDF is larger than 100 MB.");
+ clearError();
+ file=f;
+ fname.textContent=f.name;
+ fmeta.textContent=fmt(f.size);
+ body.classList.add("show");
+ result.classList.remove("show");
+ output=null;
+}
+
+choose.onclick=()=>input.click();
+input.onchange=()=>{if(input.files[0])setFile(input.files[0]);input.value=""};
+
+["dragenter","dragover"].forEach(e=>drop.addEventListener(e,x=>{
+ x.preventDefault();
+ drop.classList.add("drag");
+}));
+["dragleave","drop"].forEach(e=>drop.addEventListener(e,x=>{
+ x.preventDefault();
+ drop.classList.remove("drag");
+}));
+drop.addEventListener("drop",e=>{if(e.dataTransfer.files[0])setFile(e.dataTransfer.files[0])});
+drop.addEventListener("click",e=>{
+ if(e.target===drop||e.target.closest(".icon"))input.click();
+});
+
+remove.onclick=()=>{
+ file=null;
+ output=null;
+ body.classList.remove("show");
+ clearError();
+};
+
+document.querySelectorAll("[data-mode]").forEach(btn=>{
+ btn.onclick=()=>{
+  document.querySelectorAll("[data-mode]").forEach(x=>x.classList.remove("active"));
+  btn.classList.add("active");
+  selectedMode=btn.dataset.mode;
+ };
+});
+
+async function loadGhostscript(){
+ if(gs)return gs;
+ if(loading)return loading;
+ loading=(async()=>{
+  engineStatus.innerHTML='<span class="loader"></span>Loading PDF engine…';
+  try{
+   const mod=await import(CDN+"gs.mjs");
+   const factory=mod.default||mod;
+   const instance=await factory({
+    locateFile:fileName=>CDN+fileName
+   });
+   gs=instance;
+   engineStatus.textContent="PDF engine ready";
+   return gs;
+  }catch(e){
+   engineStatus.textContent="Engine failed to load";
+   throw new Error("The PDF engine could not be loaded. Check your internet connection and try again.");
+  }finally{
+   loading=null;
+  }
+ })();
+ return loading;
+}
+
+function setProgress(value,label,detail=""){
+ bar.style.width=value+"%";
+ pct.textContent=Math.round(value)+"%";
+ stage.textContent=label;
+ status.textContent=detail;
+}
+
+async function compressPDF(){
+ if(!file)return;
+ clearError();
+ result.classList.remove("show");
+ compress.disabled=true;
+ progress.classList.add("show");
+ setProgress(2,"Loading PDF engine","Preparing Ghostscript WebAssembly…");
+
+ try{
+  const engine=await loadGhostscript();
+
+  setProgress(12,"Reading PDF","Loading your document into the browser…");
+  const bytes=new Uint8Array(await file.arrayBuffer());
+
+  if(bytes[0]!==37||bytes[1]!==80||bytes[2]!==68||bytes[3]!==70||bytes[4]!==45){
+   throw new Error("This file does not appear to be a valid PDF.");
+  }
+
+  const inputName="input.pdf";
+  const outputNameGS="output.pdf";
+
+  try{engine.FS.unlink(inputName)}catch(e){}
+  try{engine.FS.unlink(outputNameGS)}catch(e){}
+
+  engine.FS.writeFile(inputName,bytes);
+
+  setProgress(20,"Compressing PDF","Ghostscript is optimizing images, streams and resources…");
+
+  const args=[
+   "-dSAFER",
+   "-dBATCH",
+   "-dNOPAUSE",
+   "-dQUIET",
+   "-sDEVICE=pdfwrite",
+   "-dCompatibilityLevel=1.4",
+   "-dAutoRotatePages=/None",
+   "-dDetectDuplicateImages=true",
+   "-dCompressFonts=true",
+   "-dSubsetFonts=true",
+   "-dOptimize=true"
+  ];
+
+  if(selectedMode==="screen"){
+   args.push("-dPDFSETTINGS=/screen");
+  }else if(selectedMode==="printer"){
+   args.push("-dPDFSETTINGS=/printer");
+  }else{
+   args.push("-dPDFSETTINGS=/ebook");
+  }
+
+  args.push("-sOutputFile="+outputNameGS,inputName);
+
+  await new Promise(resolve=>setTimeout(resolve,30));
+
+  let exitCode;
+  try{
+   exitCode=engine.callMain(args);
+  }catch(e){
+   throw new Error("Ghostscript could not process this PDF. It may be encrypted, damaged, or use an unsupported PDF feature.");
+  }
+
+  if(exitCode!==undefined&&exitCode!==0){
+   throw new Error("Ghostscript reported an error while processing this PDF.");
+  }
+
+  setProgress(88,"Finalizing","Reading the optimized PDF…");
+
+  let resultBytes;
+  try{
+   resultBytes=engine.FS.readFile(outputNameGS);
+  }catch(e){
+   throw new Error("The compressor finished without producing a valid output PDF.");
+  }
+
+  if(!resultBytes||resultBytes.length<20){
+   throw new Error("The generated PDF is empty or invalid.");
+  }
+
+  const original=file.size;
+  const compressed=resultBytes.length;
+
+  if(compressed>=original){
+   setProgress(100,"Finished","The original file is already smaller than the optimized result.");
+   rtitle.textContent="This PDF could not be made smaller";
+   rmeta.textContent=`Original: ${fmt(original)} · Optimized: ${fmt(compressed)}. The original was kept because it is smaller.`;
+   output=null;
+   result.classList.add("show");
+  }else{
+   output=new Blob([resultBytes],{type:"application/pdf"});
+   outputName=file.name.replace(/\.pdf$/i,"")+"_compressed.pdf";
+   const reduction=(1-compressed/original)*100;
+   setProgress(100,"Complete","Your compressed PDF is ready.");
+   rtitle.textContent="Compression complete";
+   rmeta.innerHTML=`${fmt(original)} → ${fmt(compressed)} · <span class="saved">${reduction.toFixed(1)}% smaller</span>`;
+   result.classList.add("show");
+  }
+
+  try{engine.FS.unlink(inputName)}catch(e){}
+  try{engine.FS.unlink(outputNameGS)}catch(e){}
+
+ }catch(e){
+  console.error(e);
+  setProgress(0,"Compression failed","");
+  error(e.message||"Something went wrong while compressing the PDF.");
+ }finally{
+  compress.disabled=false;
+ }
+}
+
+compress.onclick=compressPDF;
+
+download.onclick=()=>{
+ if(!output)return;
+ const url=URL.createObjectURL(output);
+ const a=document.createElement("a");
+ a.href=url;
+ a.download=outputName;
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1500);
+};
+</script>
+</body>
+</html>

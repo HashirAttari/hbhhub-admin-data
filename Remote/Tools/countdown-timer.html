@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Countdown Timer</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:hsl(var(--background));color:hsl(var(--foreground))}
+body{min-height:100vh;padding:clamp(12px,3vw,36px)}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{width:min(100%,900px);margin:auto}
+.card{background:hsl(var(--card));color:hsl(var(--card-foreground));border:1px solid hsl(var(--border));border-radius:var(--radius);overflow:hidden}
+.header{padding:clamp(20px,4vw,30px);border-bottom:1px solid hsl(var(--border))}
+.eyebrow{margin:0 0 6px;color:hsl(var(--muted-foreground));font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+h1{margin:0;font-size:clamp(1.5rem,4vw,2rem);line-height:1.2}
+.subtitle{margin:8px 0 0;color:hsl(var(--muted-foreground));font-size:.9rem}
+.content{padding:clamp(16px,4vw,30px)}
+.fields{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.field{display:flex;flex-direction:column;gap:7px}
+.label{font-size:.8rem;font-weight:700}
+.input{width:100%;height:46px;padding:9px 12px;border:1px solid hsl(var(--input));border-radius:var(--radius);background:hsl(var(--background));color:hsl(var(--foreground));outline:0;text-align:center;font-variant-numeric:tabular-nums}
+.input:focus{outline:2px solid hsl(var(--ring));outline-offset:2px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.btn{min-height:44px;padding:9px 17px;border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--secondary));color:hsl(var(--secondary-foreground));font-weight:650;transition:.15s}
+.btn:hover:not(:disabled){background:hsl(var(--muted))}
+.btn:focus-visible{outline:2px solid hsl(var(--ring));outline-offset:2px}
+.btn.primary{background:hsl(var(--primary));border-color:hsl(var(--primary));color:hsl(var(--primary-foreground))}
+.btn.primary:hover:not(:disabled){background:hsl(var(--primary)/.88)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.divider{height:1px;background:hsl(var(--border));margin:26px 0}
+.timer{padding:clamp(28px,6vw,54px) 16px;text-align:center;background:hsl(var(--muted));border:1px solid hsl(var(--border));border-radius:var(--radius)}
+.display{font-size:clamp(3rem,12vw,7rem);font-weight:750;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.045em;overflow-wrap:anywhere}
+.status{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;color:hsl(var(--muted-foreground));font-size:.85rem}
+.dot{width:8px;height:8px;border-radius:50%;background:hsl(var(--muted-foreground))}
+.running .dot{background:hsl(var(--success));box-shadow:0 0 0 4px hsl(var(--success)/.12)}
+.finished .dot{background:hsl(var(--primary));box-shadow:0 0 0 4px hsl(var(--primary)/.12)}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.preset{min-height:38px;padding:7px 12px;border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--background));color:hsl(var(--foreground));font-size:.82rem;font-weight:600}
+.preset:hover{background:hsl(var(--muted))}
+.error{margin-top:8px;color:hsl(var(--destructive));font-size:.82rem}
+@media(max-width:600px){
+body{padding:10px}
+.content{padding:15px}
+.fields{grid-template-columns:1fr}
+.actions .btn{flex:1}
+}
+</style>
+</head>
+<body>
+<main class="app">
+<section class="card">
+<header class="header">
+<p class="eyebrow">Time Utility</p>
+<h1>Countdown Timer</h1>
+<p class="subtitle">Set a duration and start a precise countdown with pause, resume, and reset controls.</p>
+</header>
+
+<div class="content">
+<div class="fields">
+<div class="field">
+<label class="label" for="hours">Hours</label>
+<input id="hours" class="input" type="number" min="0" max="99" step="1" value="0" inputmode="numeric">
+</div>
+<div class="field">
+<label class="label" for="minutes">Minutes</label>
+<input id="minutes" class="input" type="number" min="0" max="59" step="1" value="5" inputmode="numeric">
+</div>
+<div class="field">
+<label class="label" for="seconds">Seconds</label>
+<input id="seconds" class="input" type="number" min="0" max="59" step="1" value="0" inputmode="numeric">
+</div>
+</div>
+
+<div class="presets" aria-label="Quick durations">
+<button class="preset" type="button" data-seconds="60">1 min</button>
+<button class="preset" type="button" data-seconds="300">5 min</button>
+<button class="preset" type="button" data-seconds="600">10 min</button>
+<button class="preset" type="button" data-seconds="1800">30 min</button>
+<button class="preset" type="button" data-seconds="3600">1 hour</button>
+</div>
+
+<div id="error" class="error" hidden></div>
+
+<div class="actions">
+<button id="start" class="btn primary" type="button">Start</button>
+<button id="pause" class="btn" type="button" disabled>Pause</button>
+<button id="reset" class="btn" type="button">Reset</button>
+</div>
+
+<div class="divider"></div>
+
+<div id="timer" class="timer">
+<div id="display" class="display" role="timer" aria-live="polite">00:05:00</div>
+<div id="status" class="status">
+<span class="dot"></span>
+<span id="statusText">Ready</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+
+<script>
+(function(){
+"use strict";
+
+const hours=document.getElementById("hours");
+const minutes=document.getElementById("minutes");
+const seconds=document.getElementById("seconds");
+const start=document.getElementById("start");
+const pause=document.getElementById("pause");
+const reset=document.getElementById("reset");
+const display=document.getElementById("display");
+const timer=document.getElementById("timer");
+const statusText=document.getElementById("statusText");
+const error=document.getElementById("error");
+const presets=document.querySelectorAll(".preset");
+
+let duration=300000;
+let remaining=300000;
+let endTime=0;
+let running=false;
+let raf=0;
+
+function pad(value){
+return String(value).padStart(2,"0");
+}
+
+function format(ms){
+ms=Math.max(0,Math.ceil(ms/1000)*1000);
+const total=Math.floor(ms/1000);
+const h=Math.floor(total/3600);
+const m=Math.floor((total%3600)/60);
+const s=total%60;
+return pad(h)+":"+pad(m)+":"+pad(s);
+}
+
+function getInputDuration(){
+const h=Math.floor(Number(hours.value)||0);
+const m=Math.floor(Number(minutes.value)||0);
+const s=Math.floor(Number(seconds.value)||0);
+
+if(h<0||h>99||m<0||m>59||s<0||s>59){
+return null;
+}
+
+const total=(h*3600+m*60+s)*1000;
+return total>0?total:null;
+}
+
+function setInputs(ms){
+const total=Math.floor(ms/1000);
+hours.value=Math.floor(total/3600);
+minutes.value=Math.floor((total%3600)/60);
+seconds.value=total%60;
+}
+
+function setStatus(text,type){
+statusText.textContent=text;
+timer.classList.toggle("running",type==="running");
+timer.classList.toggle("finished",type==="finished");
+}
+
+function render(){
+display.textContent=format(remaining);
+}
+
+function showError(message){
+error.textContent=message;
+error.hidden=false;
+}
+
+function clearError(){
+error.hidden=true;
+error.textContent="";
+}
+
+function updateControls(){
+start.disabled=running;
+pause.disabled=!running;
+}
+
+function tick(){
+if(!running)return;
+
+remaining=Math.max(0,endTime-Date.now());
+render();
+
+if(remaining<=0){
+running=false;
+remaining=0;
+cancelAnimationFrame(raf);
+setStatus("Time's up","finished");
+updateControls();
+return;
+}
+
+raf=requestAnimationFrame(tick);
+}
+
+function startTimer(){
+clearError();
+
+if(!running&&remaining<=0){
+const value=getInputDuration();
+
+if(!value){
+showError("Set a duration greater than zero.");
+return;
+}
+
+duration=value;
+remaining=value;
+}
+
+if(!running){
+endTime=Date.now()+remaining;
+running=true;
+setStatus("Running","running");
+updateControls();
+raf=requestAnimationFrame(tick);
+}
+}
+
+function pauseTimer(){
+if(!running)return;
+
+remaining=Math.max(0,endTime-Date.now());
+running=false;
+cancelAnimationFrame(raf);
+setStatus("Paused","");
+updateControls();
+render();
+}
+
+function resetTimer(){
+running=false;
+cancelAnimationFrame(raf);
+clearError();
+
+const value=getInputDuration();
+duration=value||0;
+remaining=duration;
+
+setStatus(duration?"Ready":"Set a duration","");
+updateControls();
+render();
+}
+
+function updateFromInputs(){
+if(running)return;
+
+clearError();
+
+const value=getInputDuration();
+
+if(value){
+duration=value;
+remaining=value;
+setStatus("Ready","");
+}else{
+duration=0;
+remaining=0;
+setStatus("Set a duration","");
+}
+
+render();
+}
+
+[start, pause, reset].forEach(function(){});
+
+start.addEventListener("click",startTimer);
+pause.addEventListener("click",pauseTimer);
+reset.addEventListener("click",resetTimer);
+
+[hours,minutes,seconds].forEach(function(input){
+input.addEventListener("input",updateFromInputs);
+
+input.addEventListener("blur",function(){
+let value=Math.floor(Number(input.value)||0);
+const max=input===hours?99:59;
+value=Math.max(0,Math.min(max,value));
+input.value=value;
+updateFromInputs();
+});
+});
+
+presets.forEach(function(button){
+button.addEventListener("click",function(){
+const value=Number(button.dataset.seconds)*1000;
+setInputs(value);
+duration=value;
+remaining=value;
+running=false;
+cancelAnimationFrame(raf);
+clearError();
+setStatus("Ready","");
+updateControls();
+render();
+});
+});
+
+document.addEventListener("keydown",function(event){
+if(event.target.matches("input"))return;
+
+if(event.code==="Space"){
+event.preventDefault();
+if(running)pauseTimer();
+else startTimer();
+}
+
+if(event.key.toLowerCase()==="r"){
+resetTimer();
+}
+});
+
+duration=getInputDuration();
+remaining=duration;
+render();
+updateControls();
+
+})();
+</script>
+</body>
+</html>

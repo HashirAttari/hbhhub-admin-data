@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Markdown Previewer</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:hsl(var(--background));color:hsl(var(--foreground))}
+body{min-height:100vh;padding:clamp(10px,3vw,32px)}
+button,textarea{font:inherit}
+button{cursor:pointer}
+.app{width:min(100%,1200px);margin:auto}
+.card{background:hsl(var(--card));color:hsl(var(--card-foreground));border:1px solid hsl(var(--border));border-radius:var(--radius);overflow:hidden}
+.header{padding:clamp(20px,4vw,30px);border-bottom:1px solid hsl(var(--border))}
+.eyebrow{margin:0 0 6px;color:hsl(var(--muted-foreground));font-size:.72rem;font-weight:750;letter-spacing:.08em;text-transform:uppercase}
+h1{margin:0;font-size:clamp(1.45rem,4vw,2rem);line-height:1.2}
+.subtitle{margin:8px 0 0;color:hsl(var(--muted-foreground));font-size:.9rem;line-height:1.5}
+.content{padding:clamp(14px,3vw,26px)}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{min-height:40px;padding:8px 14px;border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--secondary));color:hsl(var(--secondary-foreground));font-weight:650;transition:.15s}
+.btn:hover{background:hsl(var(--muted))}
+.btn.primary{background:hsl(var(--primary));border-color:hsl(var(--primary));color:hsl(var(--primary-foreground))}
+.btn.primary:hover{background:hsl(var(--primary)/.88)}
+.btn:focus-visible,textarea:focus-visible{outline:2px solid hsl(var(--ring));outline-offset:2px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.panel{min-width:0;border:1px solid hsl(var(--border));border-radius:var(--radius);overflow:hidden;background:hsl(var(--background))}
+.panel-head{height:46px;padding:0 13px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid hsl(var(--border));background:hsl(var(--muted))}
+.panel-title{font-size:.8rem;font-weight:750}
+.meta{color:hsl(var(--muted-foreground));font-size:.72rem}
+.editor{display:block;width:100%;height:520px;padding:16px;border:0;outline:0;resize:none;overflow-y:auto;overflow-x:hidden;background:hsl(var(--background));color:hsl(var(--foreground));font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.84rem;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
+.preview{height:520px;padding:20px;overflow-y:auto;overflow-x:auto;line-height:1.7;overflow-wrap:anywhere}
+.preview h1,.preview h2,.preview h3,.preview h4,.preview h5,.preview h6{line-height:1.25;margin:0 0 .65em}
+.preview h1{font-size:2em}
+.preview h2{font-size:1.55em;border-bottom:1px solid hsl(var(--border));padding-bottom:.3em}
+.preview h3{font-size:1.25em}
+.preview p{margin:.75em 0}
+.preview a{color:hsl(var(--primary));text-decoration:underline}
+.preview strong{font-weight:750}
+.preview em{font-style:italic}
+.preview del{text-decoration:line-through}
+.preview blockquote{margin:1em 0;padding:.6em 1em;border-left:3px solid hsl(var(--primary));background:hsl(var(--muted));color:hsl(var(--muted-foreground))}
+.preview ul,.preview ol{padding-left:1.6em}
+.preview li{margin:.25em 0}
+.preview hr{border:0;border-top:1px solid hsl(var(--border));margin:1.25em 0}
+.preview code{padding:.15em .35em;border-radius:5px;background:hsl(var(--muted));font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em}
+.preview pre{padding:14px;overflow:auto;border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--muted));white-space:pre}
+.preview pre code{padding:0;background:transparent}
+.preview table{width:100%;border-collapse:collapse;margin:1em 0;min-width:420px}
+.preview th,.preview td{padding:8px 10px;border:1px solid hsl(var(--border));text-align:left}
+.preview th{background:hsl(var(--muted));font-weight:700}
+.preview img{max-width:100%;height:auto;border-radius:var(--radius)}
+.empty{height:100%;min-height:460px;display:flex;align-items:center;justify-content:center;text-align:center;color:hsl(var(--muted-foreground));font-size:.85rem}
+.footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:10px;color:hsl(var(--muted-foreground));font-size:.72rem}
+@media(max-width:760px){
+body{padding:8px}
+.content{padding:12px}
+.layout{grid-template-columns:1fr}
+.editor,.preview{height:420px}
+.empty{min-height:360px}
+}
+@media(max-width:420px){
+.editor,.preview{height:360px}
+.actions{width:100%}
+.actions .btn{flex:1}
+}
+</style>
+</head>
+<body>
+<main class="app">
+<section class="card">
+<header class="header">
+<p class="eyebrow">Markdown Utility</p>
+<h1>Markdown Previewer</h1>
+<p class="subtitle">Write Markdown on the left and see a clean rendered preview instantly.</p>
+</header>
+
+<div class="content">
+<div class="toolbar">
+<div class="actions">
+<button id="sample" class="btn" type="button">Load Sample</button>
+<button id="clear" class="btn" type="button">Clear</button>
+</div>
+
+<div class="actions">
+<button id="copyMarkdown" class="btn" type="button">Copy Markdown</button>
+<button id="copyHtml" class="btn primary" type="button">Copy HTML</button>
+</div>
+</div>
+
+<div class="layout">
+<section class="panel">
+<div class="panel-head">
+<span class="panel-title">Markdown</span>
+<span id="count" class="meta">0 characters</span>
+</div>
+<textarea id="editor" class="editor" spellcheck="false" placeholder="# Start writing...
+
+Type Markdown here to see the preview."></textarea>
+</section>
+
+<section class="panel">
+<div class="panel-head">
+<span class="panel-title">Preview</span>
+<span class="meta">Live</span>
+</div>
+<div id="preview" class="preview">
+<div class="empty">Your rendered Markdown will appear here.</div>
+</div>
+</section>
+</div>
+
+<div class="footer">
+<span>Supports headings, lists, links, images, code, quotes, tables and more.</span>
+<span id="words">0 words</span>
+</div>
+</div>
+</section>
+</main>
+
+<script>
+(function(){
+"use strict";
+
+const editor=document.getElementById("editor");
+const preview=document.getElementById("preview");
+const sample=document.getElementById("sample");
+const clear=document.getElementById("clear");
+const copyMarkdown=document.getElementById("copyMarkdown");
+const copyHtml=document.getElementById("copyHtml");
+const count=document.getElementById("count");
+const words=document.getElementById("words");
+
+function escapeHtml(value){
+return String(value)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#39;");
+}
+
+function inlineMarkdown(value){
+let s=escapeHtml(value);
+const stash=[];
+
+function save(html){
+const key="@@MD"+stash.length+"@@";
+stash.push(html);
+return key;
+}
+
+s=s.replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)(?:\s+"([^"]*)")?\)/g,function(_,alt,url,title){
+return save("<img src=\""+escapeHtml(url)+"\" alt=\""+escapeHtml(alt)+"\""+(title?" title=\""+escapeHtml(title)+"\"":"")+">");
+});
+
+s=s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)(?:\s+"([^"]*)")?\)/g,function(_,text,url,title){
+return save("<a href=\""+escapeHtml(url)+"\" target=\"_blank\" rel=\"noopener noreferrer\""+(title?" title=\""+escapeHtml(title)+"\"":"")+">"+text+"</a>");
+});
+
+s=s.replace(/`([^`\n]+)`/g,"<code>$1</code>");
+s=s.replace(/\*\*([^*\n]+)\*\*/g,"<strong>$1</strong>");
+s=s.replace(/__([^_\n]+)__/g,"<strong>$1</strong>");
+s=s.replace(/~~([^~\n]+)~~/g,"<del>$1</del>");
+s=s.replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g,"<em>$1</em>");
+s=s.replace(/(?<!_)_([^_\n]+)_(?!_)/g,"<em>$1</em>");
+
+stash.forEach(function(html,i){
+s=s.replace("@@MD"+i+"@@",html);
+});
+
+return s;
+}
+
+function parseMarkdown(md){
+if(!md.trim()){
+return'<div class="empty">Your rendered Markdown will appear here.</div>';
+}
+
+const lines=md.replace(/\r/g,"").split("\n");
+let html="";
+let i=0;
+let paragraph=[];
+
+function flushParagraph(){
+if(!paragraph.length)return;
+
+const text=paragraph.join("\n").trim();
+
+if(text){
+html+="<p>"+inlineMarkdown(text).replace(/\n/g,"<br>")+"</p>";
+}
+
+paragraph=[];
+}
+
+while(i<lines.length){
+const line=lines[i];
+
+if(/^```/.test(line)){
+flushParagraph();
+
+const lang=line.slice(3).trim();
+const code=[];
+
+i++;
+
+while(i<lines.length&&!/^```/.test(lines[i])){
+code.push(lines[i]);
+i++;
+}
+
+if(i<lines.length)i++;
+
+html+="<pre><code"+(lang?" data-language=\""+escapeHtml(lang)+"\"":"")+">"+escapeHtml(code.join("\n"))+"</code></pre>";
+continue;
+}
+
+if(/^ {0,3}#{1,6}\s+/.test(line)){
+flushParagraph();
+
+const match=line.match(/^ {0,3}(#{1,6})\s+(.+?)\s*#*\s*$/);
+const level=match[1].length;
+
+html+="<h"+level+">"+inlineMarkdown(match[2])+"</h"+level+">";
+
+i++;
+continue;
+}
+
+if(/^ {0,3}>\s?/.test(line)){
+flushParagraph();
+
+const quote=[];
+
+while(i<lines.length&&/^ {0,3}>\s?/.test(lines[i])){
+quote.push(lines[i].replace(/^ {0,3}>\s?/,""));
+i++;
+}
+
+html+="<blockquote>"+inlineMarkdown(quote.join("\n")).replace(/\n/g,"<br>")+"</blockquote>";
+continue;
+}
+
+if(/^ {0,3}([-*_])(?:\s*\1){2,}\s*$/.test(line)){
+flushParagraph();
+html+="<hr>";
+i++;
+continue;
+}
+
+if(/^ {0,3}[-*+]\s+/.test(line)){
+flushParagraph();
+
+const items=[];
+
+while(i<lines.length&&/^ {0,3}[-*+]\s+/.test(lines[i])){
+items.push(lines[i].replace(/^ {0,3}[-*+]\s+/,""));
+i++;
+}
+
+html+="<ul>"+items.map(function(x){
+return"<li>"+inlineMarkdown(x)+"</li>";
+}).join("")+"</ul>";
+
+continue;
+}
+
+if(/^ {0,3}\d+[.)]\s+/.test(line)){
+flushParagraph();
+
+const items=[];
+
+while(i<lines.length&&/^ {0,3}\d+[.)]\s+/.test(lines[i])){
+items.push(lines[i].replace(/^ {0,3}\d+[.)]\s+/,""));
+i++;
+}
+
+html+="<ol>"+items.map(function(x){
+return"<li>"+inlineMarkdown(x)+"</li>";
+}).join("")+"</ol>";
+
+continue;
+}
+
+if(i+1<lines.length&&/^\s*\|?[\s:-]+\|[\s|:-]*$/.test(lines[i+1])&&line.includes("|")){
+flushParagraph();
+
+function splitRow(row){
+let clean=row.trim();
+
+if(clean.startsWith("|"))clean=clean.slice(1);
+if(clean.endsWith("|"))clean=clean.slice(0,-1);
+
+return clean.split("|").map(function(x){
+return x.trim();
+});
+}
+
+const headers=splitRow(line);
+
+i+=2;
+
+let table="<table><thead><tr>";
+
+headers.forEach(function(cell){
+table+="<th>"+inlineMarkdown(cell)+"</th>";
+});
+
+table+="</tr></thead>";
+
+const body=[];
+
+while(i<lines.length&&lines[i].includes("|")&&lines[i].trim()!==""){
+body.push(splitRow(lines[i]));
+i++;
+}
+
+if(body.length){
+table+="<tbody>";
+
+body.forEach(function(row){
+table+="<tr>";
+
+for(let c=0;c<headers.length;c++){
+table+="<td>"+inlineMarkdown(row[c]||"")+"</td>";
+}
+
+table+="</tr>";
+});
+
+table+="</tbody>";
+}
+
+table+="</table>";
+html+=table;
+continue;
+}
+
+if(!line.trim()){
+flushParagraph();
+i++;
+continue;
+}
+
+paragraph.push(line);
+i++;
+}
+
+flushParagraph();
+
+return html;
+}
+
+function render(){
+const value=editor.value;
+
+preview.innerHTML=parseMarkdown(value);
+
+const chars=value.length;
+count.textContent=chars.toLocaleString()+" character"+(chars===1?"":"s");
+
+const trimmed=value.trim();
+const wordCount=trimmed?trimmed.split(/\s+/).length:0;
+
+words.textContent=wordCount.toLocaleString()+" word"+(wordCount===1?"":"s");
+}
+
+const sampleText=`# Markdown Previewer
+
+## Welcome
+
+This is a **Markdown previewer** with support for common Markdown syntax.
+
+### Features
+
+- **Bold** and *italic* text
+- [Links](https://example.com)
+- Inline \`code\`
+- Ordered and unordered lists
+- Blockquotes
+- Fenced code blocks
+- Tables
+- Images
+
+> Write your Markdown on the left and see the result here instantly.
+
+### Example Table
+
+| Name | Role | Status |
+| --- | --- | --- |
+| Ayesha | Designer | Active |
+| Hamza | Developer | Active |
+| Sara | Manager | Pending |
+
+### Code
+
+\`\`\`javascript
+const message = "Hello Markdown!";
+console.log(message);
+\`\`\`
+
+---
+
+Start editing this example to create your own Markdown.`;
+
+function flashButton(button,text,original){
+button.textContent=text;
+
+setTimeout(function(){
+button.textContent=original;
+},1200);
+}
+
+async function copyText(value,button,original){
+if(!value)return;
+
+try{
+await navigator.clipboard.writeText(value);
+flashButton(button,"Copied",original);
+}catch(error){
+const temp=document.createElement("textarea");
+temp.value=value;
+temp.style.position="fixed";
+temp.style.opacity="0";
+document.body.appendChild(temp);
+temp.select();
+
+try{
+document.execCommand("copy");
+flashButton(button,"Copied",original);
+}catch(e){
+flashButton(button,"Copy failed",original);
+}
+
+temp.remove();
+}
+}
+
+editor.addEventListener("input",render);
+
+sample.addEventListener("click",function(){
+editor.value=sampleText;
+render();
+editor.focus();
+});
+
+clear.addEventListener("click",function(){
+editor.value="";
+render();
+editor.focus();
+});
+
+copyMarkdown.addEventListener("click",function(){
+copyText(editor.value,copyMarkdown,"Copy Markdown");
+});
+
+copyHtml.addEventListener("click",function(){
+const html=parseMarkdown(editor.value);
+copyText(html,copyHtml,"Copy HTML");
+});
+
+document.addEventListener("keydown",function(event){
+if((event.ctrlKey||event.metaKey)&&event.key==="Enter"){
+event.preventDefault();
+render();
+}
+});
+
+render();
+
+})();
+</script>
+</body>
+</html>

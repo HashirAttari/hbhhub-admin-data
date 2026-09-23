@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stopwatch</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:hsl(var(--background));color:hsl(var(--foreground))}
+body{min-height:100vh;padding:clamp(16px,4vw,48px)}
+button{font:inherit}
+.app{width:min(100%,760px);margin:auto}
+.card{background:hsl(var(--card));color:hsl(var(--card-foreground));border:1px solid hsl(var(--border));border-radius:var(--radius);overflow:hidden}
+.header{padding:clamp(20px,4vw,32px);border-bottom:1px solid hsl(var(--border))}
+.eyebrow{margin:0 0 6px;color:hsl(var(--muted-foreground));font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+h1{margin:0;font-size:clamp(1.5rem,4vw,2rem);line-height:1.2}
+.main{padding:clamp(24px,5vw,48px)}
+.display-wrap{display:flex;justify-content:center;align-items:center;min-height:clamp(190px,35vw,260px);padding:clamp(20px,5vw,40px);background:hsl(var(--muted));border:1px solid hsl(var(--border));border-radius:var(--radius)}
+.display{width:100%;text-align:center;font-variant-numeric:tabular-nums;font-feature-settings:"tnum";font-size:clamp(2.8rem,11vw,6.5rem);font-weight:700;letter-spacing:-.05em;line-height:1;overflow-wrap:anywhere}
+.status{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;color:hsl(var(--muted-foreground));font-size:.9rem}
+.dot{width:8px;height:8px;border-radius:50%;background:hsl(var(--muted-foreground));transition:.2s}
+.running .dot{background:hsl(var(--success));box-shadow:0 0 0 4px hsl(var(--success)/.12)}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}
+.btn{min-height:48px;padding:10px 18px;border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--secondary));color:hsl(var(--secondary-foreground));font-weight:650;cursor:pointer;transition:background .15s,border-color .15s,transform .05s}
+.btn:hover:not(:disabled){background:hsl(var(--muted));border-color:hsl(var(--input))}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:focus-visible{outline:2px solid hsl(var(--ring));outline-offset:2px}
+.btn.primary{background:hsl(var(--primary));color:hsl(var(--primary-foreground));border-color:hsl(var(--primary))}
+.btn.primary:hover:not(:disabled){background:hsl(var(--primary)/.88)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.lap-row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:28px}
+.section-title{margin:0;font-size:1rem;font-weight:700}
+.small-btn{min-height:36px;padding:7px 12px;font-size:.84rem}
+.laps{margin-top:12px;border:1px solid hsl(var(--border));border-radius:var(--radius);overflow:hidden}
+.lap-empty{padding:24px;text-align:center;color:hsl(var(--muted-foreground));font-size:.9rem}
+.lap{display:grid;grid-template-columns:56px 1fr 1fr;gap:12px;padding:13px 16px;border-bottom:1px solid hsl(var(--border));font-variant-numeric:tabular-nums}
+.lap:last-child{border-bottom:0}
+.lap-number{color:hsl(var(--muted-foreground))}
+.lap-time{text-align:right;font-weight:650}
+.lap-total{text-align:right;color:hsl(var(--muted-foreground))}
+.laps{max-height:280px;overflow:auto}
+.laps::-webkit-scrollbar{width:8px}
+.laps::-webkit-scrollbar-thumb{background:hsl(var(--border));border-radius:99px}
+@media(max-width:420px){
+ body{padding:10px}
+ .main{padding:16px}
+ .controls{grid-template-columns:1fr}
+ .display{font-size:clamp(2.4rem,15vw,4rem)}
+ .lap{grid-template-columns:42px 1fr 1fr;padding:12px}
+}
+@media(min-width:600px){.controls{grid-template-columns:1fr 1fr 1fr}.controls .reset{grid-column:auto}}
+</style>
+</head>
+<body>
+<main class="app">
+<section class="card">
+<header class="header">
+<p class="eyebrow">Time Utility</p>
+<h1>Stopwatch</h1>
+</header>
+<div class="main">
+<div class="display-wrap">
+<div>
+<div id="display" class="display" role="timer" aria-live="polite">00:00.00</div>
+<div id="status" class="status"><span class="dot"></span><span>Ready</span></div>
+</div>
+</div>
+
+<div class="controls">
+<button id="start" class="btn primary" type="button">Start</button>
+<button id="lap" class="btn" type="button" disabled>Lap</button>
+<button id="reset" class="btn reset" type="button">Reset</button>
+</div>
+
+<div class="lap-row">
+<h2 class="section-title">Lap times</h2>
+<button id="clear" class="btn small-btn" type="button" disabled>Clear laps</button>
+</div>
+<div id="laps" class="laps" aria-live="polite">
+<div id="empty" class="lap-empty">No laps recorded yet.</div>
+</div>
+</div>
+</section>
+</main>
+
+<script>
+(()=>{"use strict";
+const display=document.getElementById("display"),start=document.getElementById("start"),lap=document.getElementById("lap"),reset=document.getElementById("reset"),clear=document.getElementById("clear"),lapsBox=document.getElementById("laps"),empty=document.getElementById("empty"),status=document.getElementById("status"),statusText=status.lastElementChild;
+let running=false,startTime=0,elapsed=0,lastLap=0,raf=0,lapCount=0;
+
+const format=ms=>{
+ ms=Math.max(0,ms);
+ const cs=Math.floor(ms/10)%100,s=Math.floor(ms/1000)%60,m=Math.floor(ms/60000)%60,h=Math.floor(ms/3600000);
+ return (h?String(h).padStart(2,"0")+":":"")+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")+"."+String(cs).padStart(2,"0");
+};
+const current=()=>running?elapsed+(performance.now()-startTime):elapsed;
+const render=()=>{display.textContent=format(current());if(running)raf=requestAnimationFrame(render)};
+const setRunningUI=()=>{
+ start.textContent=running?"Pause":"Start";
+ lap.disabled=!running;
+ document.body.classList.toggle("running",running);
+ statusText.textContent=running?"Running":elapsed?"Paused":"Ready";
+};
+const toggle=()=>{
+ if(running){elapsed+=performance.now()-startTime;running=false;cancelAnimationFrame(raf)}
+ else{startTime=performance.now();running=true;raf=requestAnimationFrame(render)}
+ setRunningUI();render();
+};
+const addLap=()=>{
+ if(!running)return;
+ const total=current(),split=total-lastLap;lastLap=total;lapCount++;
+ if(empty)empty.remove();
+ const row=document.createElement("div");row.className="lap";
+ row.innerHTML=`<span class="lap-number">#${lapCount}</span><span class="lap-time">${format(split)}</span><span class="lap-total">${format(total)}</span>`;
+ lapsBox.prepend(row);clear.disabled=false;
+};
+const resetAll=()=>{
+ running=false;cancelAnimationFrame(raf);elapsed=0;startTime=0;lastLap=0;lapCount=0;
+ display.textContent="00:00.00";lapsBox.innerHTML='<div id="empty" class="lap-empty">No laps recorded yet.</div>';
+ clear.disabled=true;setRunningUI();
+};
+const clearLaps=()=>{
+ lapsBox.innerHTML='<div id="empty" class="lap-empty">No laps recorded yet.</div>';
+ clear.disabled=true;
+};
+start.addEventListener("click",toggle);
+lap.addEventListener("click",addLap);
+reset.addEventListener("click",resetAll);
+clear.addEventListener("click",clearLaps);
+document.addEventListener("keydown",e=>{
+ if(e.target.matches("input,textarea,select"))return;
+ if(e.code==="Space"){e.preventDefault();toggle()}
+ else if(e.key.toLowerCase()==="l"&&!lap.disabled)addLap();
+ else if(e.key.toLowerCase()==="r")resetAll();
+});
+setRunningUI();
+})();
+</script>
+</body>
+</html>

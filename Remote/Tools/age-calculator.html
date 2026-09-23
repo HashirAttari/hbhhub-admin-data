@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Age Calculator</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:hsl(var(--background));color:hsl(var(--foreground))}
+body{min-height:100vh;padding:clamp(12px,3vw,36px)}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{width:min(100%,900px);margin:auto}
+.card{background:hsl(var(--card));color:hsl(var(--card-foreground));border:1px solid hsl(var(--border));border-radius:var(--radius);overflow:hidden}
+.header{padding:clamp(20px,4vw,30px);border-bottom:1px solid hsl(var(--border))}
+.eyebrow{margin:0 0 6px;color:hsl(var(--muted-foreground));font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+h1{margin:0;font-size:clamp(1.5rem,4vw,2rem);line-height:1.2}
+.subtitle{margin:8px 0 0;color:hsl(var(--muted-foreground));font-size:.9rem}
+.content{padding:clamp(16px,4vw,30px)}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field{display:flex;flex-direction:column;gap:8px}
+.label{font-size:.82rem;font-weight:700}
+.input{width:100%;height:46px;padding:10px 12px;border:1px solid hsl(var(--input));border-radius:var(--radius);background:hsl(var(--background));color:hsl(var(--foreground));outline:0}
+.input:focus{outline:2px solid hsl(var(--ring));outline-offset:2px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.btn{min-height:44px;padding:9px 17px;border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--secondary));color:hsl(var(--secondary-foreground));font-weight:650;transition:.15s}
+.btn:hover{background:hsl(var(--muted))}
+.btn:focus-visible{outline:2px solid hsl(var(--ring));outline-offset:2px}
+.btn.primary{background:hsl(var(--primary));border-color:hsl(var(--primary));color:hsl(var(--primary-foreground))}
+.btn.primary:hover{background:hsl(var(--primary)/.88)}
+.error{margin-top:8px;color:hsl(var(--destructive));font-size:.82rem}
+.divider{height:1px;background:hsl(var(--border));margin:26px 0}
+.result-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.result-title{margin:0;font-size:1rem;font-weight:700}
+.badge{display:inline-flex;align-items:center;min-height:28px;padding:4px 9px;border-radius:999px;background:hsl(var(--muted));color:hsl(var(--muted-foreground));font-size:.76rem;font-weight:700}
+.badge.success{background:hsl(var(--success)/.12);color:hsl(var(--success))}
+.results{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.result{padding:18px 14px;border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--muted));text-align:center}
+.result-value{display:block;font-size:clamp(1.6rem,5vw,2.5rem);font-weight:750;line-height:1.1;font-variant-numeric:tabular-nums}
+.result-label{display:block;margin-top:6px;color:hsl(var(--muted-foreground));font-size:.78rem;font-weight:600}
+.summary{margin-top:14px;padding:15px;border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--background));font-size:.9rem;line-height:1.6}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+.stat{padding:13px 14px;border:1px solid hsl(var(--border));border-radius:var(--radius)}
+.stat-label{display:block;color:hsl(var(--muted-foreground));font-size:.75rem}
+.stat-value{display:block;margin-top:4px;font-size:.95rem;font-weight:700;font-variant-numeric:tabular-nums}
+.empty{padding:24px;text-align:center;color:hsl(var(--muted-foreground));border:1px solid hsl(var(--border));border-radius:var(--radius);font-size:.88rem}
+@media(max-width:600px){
+ body{padding:10px}
+ .content{padding:15px}
+ .fields{grid-template-columns:1fr}
+ .actions .btn{flex:1}
+ .results{grid-template-columns:1fr}
+ .stats{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<main class="app">
+<section class="card">
+<header class="header">
+<p class="eyebrow">Date Utility</p>
+<h1>Age Calculator</h1>
+<p class="subtitle">Calculate your exact age and see useful date-based details.</p>
+</header>
+
+<div class="content">
+<div class="fields">
+<div class="field">
+<label class="label" for="birthDate">Date of birth</label>
+<input id="birthDate" class="input" type="date" autocomplete="bday">
+</div>
+
+<div class="field">
+<label class="label" for="targetDate">Calculate age on</label>
+<input id="targetDate" class="input" type="date">
+</div>
+</div>
+
+<div id="error" class="error" hidden></div>
+
+<div class="actions">
+<button id="calculate" class="btn primary" type="button">Calculate Age</button>
+<button id="today" class="btn" type="button">Use Today</button>
+<button id="clear" class="btn" type="button">Clear</button>
+</div>
+
+<div class="divider"></div>
+
+<div id="empty" class="empty">Enter your date of birth to calculate your age.</div>
+
+<div id="results" hidden>
+<div class="result-head">
+<h2 class="result-title">Your age</h2>
+<span id="status" class="badge success">Calculated</span>
+</div>
+
+<div class="results">
+<div class="result">
+<span id="years" class="result-value">0</span>
+<span class="result-label">Years</span>
+</div>
+<div class="result">
+<span id="months" class="result-value">0</span>
+<span class="result-label">Months</span>
+</div>
+<div class="result">
+<span id="days" class="result-value">0</span>
+<span class="result-label">Days</span>
+</div>
+</div>
+
+<div id="summary" class="summary"></div>
+
+<div class="stats">
+<div class="stat">
+<span class="stat-label">Total days</span>
+<span id="totalDays" class="stat-value">—</span>
+</div>
+<div class="stat">
+<span class="stat-label">Total weeks</span>
+<span id="totalWeeks" class="stat-value">—</span>
+</div>
+<div class="stat">
+<span class="stat-label">Next birthday</span>
+<span id="nextBirthday" class="stat-value">—</span>
+</div>
+<div class="stat">
+<span class="stat-label">Days until birthday</span>
+<span id="daysUntil" class="stat-value">—</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+
+<script>
+(function(){
+"use strict";
+
+const birth=document.getElementById("birthDate");
+const target=document.getElementById("targetDate");
+const calculate=document.getElementById("calculate");
+const todayBtn=document.getElementById("today");
+const clearBtn=document.getElementById("clear");
+const error=document.getElementById("error");
+const empty=document.getElementById("empty");
+const results=document.getElementById("results");
+const years=document.getElementById("years");
+const months=document.getElementById("months");
+const days=document.getElementById("days");
+const summary=document.getElementById("summary");
+const totalDays=document.getElementById("totalDays");
+const totalWeeks=document.getElementById("totalWeeks");
+const nextBirthday=document.getElementById("nextBirthday");
+const daysUntil=document.getElementById("daysUntil");
+
+function pad(n){return String(n).padStart(2,"0")}
+
+function localDateString(date){
+return date.getFullYear()+"-"+pad(date.getMonth()+1)+"-"+pad(date.getDate());
+}
+
+function parseDate(value){
+if(!value)return null;
+const parts=value.split("-").map(Number);
+if(parts.length!==3||parts.some(Number.isNaN))return null;
+const date=new Date(parts[0],parts[1]-1,parts[2]);
+if(date.getFullYear()!==parts[0]||date.getMonth()!==parts[1]-1||date.getDate()!==parts[2])return null;
+return date;
+}
+
+function startOfDay(date){
+return new Date(date.getFullYear(),date.getMonth(),date.getDate());
+}
+
+function daysBetween(a,b){
+return Math.round((startOfDay(b)-startOfDay(a))/86400000);
+}
+
+function formatDate(date){
+return date.toLocaleDateString(undefined,{year:"numeric",month:"long",day:"numeric"});
+}
+
+function isLeapYear(year){
+return year%4===0&&(year%100!==0||year%400===0);
+}
+
+function birthdayThisYear(year,month,day){
+if(month===1&&day===29&&!isLeapYear(year))return new Date(year,1,28);
+return new Date(year,month,day);
+}
+
+function calculateAge(){
+error.hidden=true;
+error.textContent="";
+
+const dob=parseDate(birth.value);
+const end=parseDate(target.value);
+
+if(!dob){
+error.textContent="Please enter a valid date of birth.";
+error.hidden=false;
+return;
+}
+
+if(!end){
+error.textContent="Please enter a valid calculation date.";
+error.hidden=false;
+return;
+}
+
+if(dob>end){
+error.textContent="The calculation date cannot be before the date of birth.";
+error.hidden=false;
+return;
+}
+
+let y=end.getFullYear()-dob.getFullYear();
+let m=end.getMonth()-dob.getMonth();
+let d=end.getDate()-dob.getDate();
+
+if(d<0){
+m--;
+const previousMonth=new Date(end.getFullYear(),end.getMonth(),0);
+d+=previousMonth.getDate();
+}
+
+if(m<0){
+y--;
+m+=12;
+}
+
+const total=daysBetween(dob,end);
+const weeks=Math.floor(total/7);
+
+let next=birthdayThisYear(end.getFullYear(),dob.getMonth(),dob.getDate());
+
+if(next<startOfDay(end)){
+next=birthdayThisYear(end.getFullYear()+1,dob.getMonth(),dob.getDate());
+}
+
+const until=daysBetween(end,next);
+const ageLabel=y+" year"+(y===1?"":"s")+", "+m+" month"+(m===1?"":"s")+" and "+d+" day"+(d===1?"":"s");
+
+years.textContent=y.toLocaleString();
+months.textContent=m.toLocaleString();
+days.textContent=d.toLocaleString();
+
+summary.textContent="You are "+ageLabel+" old as of "+formatDate(end)+".";
+
+totalDays.textContent=total.toLocaleString();
+totalWeeks.textContent=weeks.toLocaleString();
+nextBirthday.textContent=formatDate(next);
+daysUntil.textContent=until===0?"Today":until.toLocaleString();
+
+empty.hidden=true;
+results.hidden=false;
+}
+
+function useToday(){
+target.value=localDateString(new Date());
+if(birth.value)calculateAge();
+}
+
+function clearAll(){
+birth.value="";
+target.value=localDateString(new Date());
+error.hidden=true;
+error.textContent="";
+results.hidden=true;
+empty.hidden=false;
+birth.focus();
+}
+
+target.value=localDateString(new Date());
+
+calculate.addEventListener("click",calculateAge);
+todayBtn.addEventListener("click",useToday);
+clearBtn.addEventListener("click",clearAll);
+
+birth.addEventListener("change",function(){
+if(birth.value)calculateAge();
+});
+
+target.addEventListener("change",function(){
+if(birth.value)calculateAge();
+});
+
+document.addEventListener("keydown",function(event){
+if(event.key==="Enter"&&document.activeElement.tagName!=="BUTTON"){
+calculateAge();
+}
+});
+
+})();
+</script>
+</body>
+</html>

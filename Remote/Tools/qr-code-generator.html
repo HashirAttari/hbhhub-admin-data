@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QR Code Generator</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:hsl(var(--background));color:hsl(var(--foreground))}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.app{width:min(1050px,100%);margin:auto;padding:clamp(18px,4vw,42px) clamp(12px,4vw,28px)}
+.hero{margin-bottom:22px}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;color:hsl(var(--primary));font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em}
+.eyebrow i{width:7px;height:7px;border-radius:50%;background:hsl(var(--primary))}
+.hero h1{font-size:clamp(29px,5vw,43px);line-height:1.05;letter-spacing:-.04em;margin:8px 0}
+.hero p{margin:0;max-width:680px;color:hsl(var(--muted-foreground));font-size:14px;line-height:1.6}
+.panel{background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:calc(var(--radius) + 6px);box-shadow:0 15px 45px hsl(var(--foreground)/.06);overflow:hidden}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) 390px}
+.controls{padding:22px;border-right:1px solid hsl(var(--border))}
+.preview{padding:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:560px;background:hsl(var(--secondary)/.28)}
+
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:17px}
+.tab{white-space:nowrap;flex:0 0 auto;border:1px solid hsl(var(--border));background:hsl(var(--secondary));color:hsl(var(--secondary-foreground));padding:9px 12px;border-radius:calc(var(--radius) - 2px);font-size:12px;font-weight:750}
+.tab.active{background:hsl(var(--primary));color:hsl(var(--primary-foreground));border-color:hsl(var(--primary))}
+
+.field{margin-bottom:15px}
+.field label{display:block;font-size:12px;font-weight:750;margin-bottom:7px}
+.field textarea,.field input,.field select{width:100%;border:1px solid hsl(var(--input));background:hsl(var(--background));color:hsl(var(--foreground));border-radius:var(--radius);outline:none;padding:11px 12px}
+.field textarea{min-height:125px;resize:vertical;line-height:1.5}
+.field textarea:focus,.field input:focus,.field select:focus{border-color:hsl(var(--ring));box-shadow:0 0 0 3px hsl(var(--ring)/.12)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.color-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.color-box{display:flex;align-items:center;gap:8px;border:1px solid hsl(var(--border));border-radius:var(--radius);padding:7px;background:hsl(var(--background))}
+.color-box input[type=color]{width:35px;height:31px;border:0;padding:0;background:transparent}
+.color-box span{font-size:11px;color:hsl(var(--muted-foreground))}
+.range{display:grid;grid-template-columns:1fr 48px;align-items:center;gap:10px}
+.range input{padding:0;accent-color:hsl(var(--primary))}
+.range output{text-align:right;font-size:12px;color:hsl(var(--muted-foreground))}
+.hint{font-size:10px;color:hsl(var(--muted-foreground));margin-top:5px;line-height:1.4}
+
+.preview-title{align-self:stretch;font-size:12px;font-weight:750;margin-bottom:13px}
+.qr-wrap{width:min(310px,80vw);aspect-ratio:1;background:white;padding:16px;border-radius:16px;box-shadow:0 12px 35px hsl(var(--foreground)/.12);display:grid;place-items:center}
+.qr-wrap canvas{width:100%;height:100%;image-rendering:pixelated}
+.empty{width:min(310px,80vw);aspect-ratio:1;background:hsl(var(--card));border:1px dashed hsl(var(--border));border-radius:16px;display:grid;place-items:center;text-align:center;padding:30px;color:hsl(var(--muted-foreground));font-size:12px;line-height:1.5}
+.actions{display:flex;gap:8px;width:min(310px,80vw);margin-top:14px}
+.btn{border:1px solid hsl(var(--border));background:hsl(var(--secondary));color:hsl(var(--secondary-foreground));padding:10px 15px;border-radius:calc(var(--radius) - 2px);font-size:12px;font-weight:800;transition:.15s}
+.btn:hover{filter:brightness(.97)}
+.btn.primary{background:hsl(var(--primary));color:hsl(var(--primary-foreground));border-color:hsl(var(--primary))}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.actions .btn{flex:1}
+.status{width:min(310px,80vw);text-align:center;font-size:11px;color:hsl(var(--muted-foreground));margin-top:9px;min-height:16px}
+.error{display:none;margin-top:12px;border:1px solid hsl(var(--primary)/.3);background:hsl(var(--primary)/.06);border-radius:var(--radius);padding:11px;font-size:12px;line-height:1.5}
+.error.show{display:block}
+.footer-note{text-align:center;color:hsl(var(--muted-foreground));font-size:11px;line-height:1.55;margin:15px auto 0;max-width:750px}
+
+@media(max-width:800px){
+.workspace{grid-template-columns:1fr}
+.controls{border-right:0;border-bottom:1px solid hsl(var(--border))}
+.preview{min-height:440px}
+}
+
+@media(max-width:500px){
+.app{padding:17px 10px}
+.controls,.preview{padding:15px}
+.row,.color-row{grid-template-columns:1fr}
+.tab{font-size:11px;padding:8px 10px}
+.qr-wrap,.empty,.actions,.status{width:min(290px,88vw)}
+}
+
+@media(max-width:350px){
+.tab{flex:1 1 auto;text-align:center}
+}
+</style>
+</head>
+
+<body>
+<main class="app">
+
+<section class="hero">
+<div class="eyebrow"><i></i> Local QR utility</div>
+<h1>Generate a QR code.</h1>
+<p>Create clean, scannable QR codes for links, Wi-Fi, contact details, email, phone numbers, and plain text. Customize the output and download it as PNG or SVG.</p>
+</section>
+
+<section class="panel">
+<div class="workspace">
+
+<div class="controls">
+
+<div class="tabs" role="tablist">
+<button class="tab active" data-type="url" type="button">Website</button>
+<button class="tab" data-type="text" type="button">Text</button>
+<button class="tab" data-type="wifi" type="button">Wi-Fi</button>
+<button class="tab" data-type="email" type="button">Email</button>
+<button class="tab" data-type="phone" type="button">Phone</button>
+<button class="tab" data-type="contact" type="button">Contact</button>
+</div>
+
+<div id="fields"></div>
+
+<div class="field">
+<label>Foreground & background</label>
+<div class="color-row">
+<div class="color-box">
+<input type="color" id="fg" value="#000000">
+<span>Foreground</span>
+</div>
+<div class="color-box">
+<input type="color" id="bg" value="#ffffff">
+<span>Background</span>
+</div>
+</div>
+</div>
+
+<div class="row">
+
+<div class="field">
+<label for="size">Output size</label>
+<select id="size">
+<option value="256">256 px</option>
+<option value="512" selected>512 px</option>
+<option value="1024">1024 px</option>
+<option value="2048">2048 px</option>
+</select>
+</div>
+
+<div class="field">
+<label for="margin">Quiet zone</label>
+<select id="margin">
+<option value="1">1 module</option>
+<option value="2">2 modules</option>
+<option value="4" selected>4 modules</option>
+<option value="6">6 modules</option>
+</select>
+</div>
+
+</div>
+
+<div class="field">
+<label>Error correction</label>
+<div class="range">
+<input type="range" id="ecc" min="0" max="3" step="1" value="2">
+<output id="eccOut">Q · 25%</output>
+</div>
+<div class="hint">Higher correction improves reliability when the code is partially obscured, but creates a denser QR.</div>
+</div>
+
+<div class="field">
+<label for="format">Download format</label>
+<select id="format">
+<option value="png" selected>PNG — best for normal use</option>
+<option value="svg">SVG — sharp at any size</option>
+</select>
+</div>
+
+<div class="error" id="error"></div>
+
+</div>
+
+<div class="preview">
+
+<div class="preview-title">Live preview</div>
+
+<div id="preview"></div>
+
+<div class="actions">
+<button class="btn primary" id="download" type="button" disabled>Download QR</button>
+<button class="btn" id="copy" type="button" disabled>Copy data</button>
+</div>
+
+<div class="status" id="status">Enter some data to generate your QR code.</div>
+
+</div>
+
+</div>
+</section>
+
+<div class="footer-note">
+QR generation happens locally in your browser. No entered text, links, passwords, or contact details are uploaded.
+</div>
+
+</main>
+
+<script type="module">
+const CDN="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm";
+
+let QR=null;
+let type="url";
+let data="";
+let lastCanvas=null;
+
+const $=id=>document.getElementById(id);
+
+const fields=$("fields");
+const preview=$("preview");
+const download=$("download");
+const copy=$("copy");
+const status=$("status");
+const error=$("error");
+const fg=$("fg");
+const bg=$("bg");
+const size=$("size");
+const margin=$("margin");
+const ecc=$("ecc");
+const eccOut=$("eccOut");
+const format=$("format");
+
+const templates={
+url:`
+<div class="field">
+<label for="url">Website URL</label>
+<input id="url" type="url" placeholder="https://example.com" autocomplete="url">
+<div class="hint">Include https:// for the most reliable scanning.</div>
+</div>`,
+
+text:`
+<div class="field">
+<label for="text">Text</label>
+<textarea id="text" placeholder="Enter any text…"></textarea>
+</div>`,
+
+wifi:`
+<div class="field">
+<label for="ssid">Network name (SSID)</label>
+<input id="ssid" placeholder="My Wi-Fi">
+</div>
+
+<div class="field">
+<label for="password">Password</label>
+<input id="password" type="password" placeholder="Wi-Fi password">
+</div>
+
+<div class="field">
+<label for="security">Security</label>
+<select id="security">
+<option value="WPA">WPA / WPA2 / WPA3</option>
+<option value="WEP">WEP</option>
+<option value="nopass">No password</option>
+</select>
+</div>
+
+<div class="field">
+<label style="display:flex;align-items:center;gap:7px;font-weight:600">
+<input type="checkbox" id="hidden" style="width:auto">
+Hidden network
+</label>
+</div>`,
+
+email:`
+<div class="field">
+<label for="email">Email address</label>
+<input id="email" type="email" placeholder="name@example.com">
+</div>
+
+<div class="field">
+<label for="subject">Subject</label>
+<input id="subject" placeholder="Subject (optional)">
+</div>
+
+<div class="field">
+<label for="message">Message</label>
+<textarea id="message" placeholder="Message (optional)"></textarea>
+</div>`,
+
+phone:`
+<div class="field">
+<label for="phone">Phone number</label>
+<input id="phone" type="tel" placeholder="+92 300 1234567">
+</div>`,
+
+contact:`
+<div class="row">
+<div class="field">
+<label for="first">First name</label>
+<input id="first" placeholder="Ali">
+</div>
+
+<div class="field">
+<label for="last">Last name</label>
+<input id="last" placeholder="Khan">
+</div>
+</div>
+
+<div class="field">
+<label for="tel">Phone</label>
+<input id="tel" type="tel" placeholder="+92 300 1234567">
+</div>
+
+<div class="field">
+<label for="mail">Email</label>
+<input id="mail" type="email" placeholder="name@example.com">
+</div>
+
+<div class="field">
+<label for="company">Company</label>
+<input id="company" placeholder="Company (optional)">
+</div>`
+};
+
+function showError(msg){
+error.textContent=msg;
+error.classList.add("show");
+}
+
+function clearError(){
+error.classList.remove("show");
+error.textContent="";
+}
+
+function renderFields(){
+
+fields.innerHTML=templates[type];
+
+fields.querySelectorAll("input,textarea,select").forEach(el=>{
+el.addEventListener("input",generate);
+el.addEventListener("change",generate);
+});
+
+generate();
+}
+
+function escWifi(s){
+return String(s)
+.replace(/\\/g,"\\\\")
+.replace(/;/g,"\\;")
+.replace(/,/g,"\\,")
+.replace(/:/g,"\\:")
+.replace(/"/g,'\\"')
+.replace(/\r?\n/g,"");
+}
+
+function getData(){
+
+if(type==="url"){
+const v=$("url")?.value.trim();
+
+if(!v)return "";
+
+try{
+new URL(v);
+}catch{
+throw new Error("Please enter a valid website URL.");
+}
+
+return v;
+}
+
+if(type==="text"){
+return $("text")?.value||"";
+}
+
+if(type==="wifi"){
+
+const ssid=$("ssid")?.value||"";
+
+if(!ssid.trim())return "";
+
+const sec=$("security").value;
+const pass=$("password").value;
+
+if(sec!=="nopass"&&!pass){
+throw new Error("Enter the Wi-Fi password or choose No password.");
+}
+
+return `WIFI:T:${sec};S:${escWifi(ssid)};P:${escWifi(pass)};H:${$("hidden").checked?"true":"false"};;`;
+}
+
+if(type==="email"){
+
+const email=$("email")?.value.trim();
+
+if(!email)return "";
+
+if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+throw new Error("Please enter a valid email address.");
+}
+
+const subject=$("subject").value;
+const message=$("message").value;
+
+const params=new URLSearchParams();
+
+if(subject)params.set("subject",subject);
+if(message)params.set("body",message);
+
+return `mailto:${email}${params.toString()?"?"+params.toString():""}`;
+}
+
+if(type==="phone"){
+
+const phone=$("phone")?.value.trim();
+
+return phone?`tel:${phone}`:"";
+}
+
+if(type==="contact"){
+
+const first=$("first")?.value.trim();
+const last=$("last")?.value.trim();
+const tel=$("tel")?.value.trim();
+const mail=$("mail")?.value.trim();
+const company=$("company")?.value.trim();
+
+if(!first&&!last&&!tel&&!mail&&!company)return "";
+
+return `BEGIN:VCARD
+VERSION:3.0
+N:${last};${first};;;
+FN:${[first,last].filter(Boolean).join(" ")}
+${company?`ORG:${company}
+`:""}${tel?`TEL:${tel}
+`:""}${mail?`EMAIL:${mail}
+`:""}END:VCARD`;
+}
+
+return "";
+}
+
+async function getQR(){
+
+if(QR)return QR;
+
+QR=await import(CDN);
+
+return QR;
+}
+
+function eccValue(){
+
+const values=["L","M","Q","H"];
+const labels=["L · 7%","M · 15%","Q · 25%","H · 30%"];
+
+eccOut.textContent=labels[Number(ecc.value)];
+
+return values[Number(ecc.value)];
+}
+
+async function generate(){
+
+clearError();
+
+try{
+data=getData();
+}catch(e){
+
+showError(e.message);
+download.disabled=true;
+copy.disabled=true;
+preview.innerHTML="";
+status.textContent="";
+return;
+}
+
+if(!data){
+
+preview.innerHTML=`
+<div class="empty">
+Your QR code will appear here.<br>
+Enter data on the left to get started.
+</div>`;
+
+download.disabled=true;
+copy.disabled=true;
+status.textContent="Enter some data to generate your QR code.";
+
+return;
+}
+
+try{
+
+const mod=await getQR();
+const QRCode=mod.default||mod;
+
+const canvas=document.createElement("canvas");
+
+const px=Number(size.value);
+
+await QRCode.toCanvas(canvas,data,{
+width:px,
+margin:Number(margin.value),
+errorCorrectionLevel:eccValue(),
+color:{
+dark:fg.value,
+light:bg.value
+}
+});
+
+lastCanvas=canvas;
+
+preview.innerHTML="";
+
+const wrap=document.createElement("div");
+
+wrap.className="qr-wrap";
+wrap.appendChild(canvas);
+
+preview.appendChild(wrap);
+
+download.disabled=false;
+copy.disabled=false;
+
+status.textContent=`${data.length.toLocaleString()} characters · ${px} × ${px} output`;
+
+}catch(e){
+
+console.error(e);
+
+preview.innerHTML=`
+<div class="empty">
+Unable to generate this QR code.
+</div>`;
+
+showError("The QR code could not be generated. Try shorter data or a lower error-correction level.");
+
+download.disabled=true;
+copy.disabled=true;
+}
+}
+
+document.querySelectorAll(".tab").forEach(btn=>{
+
+btn.addEventListener("click",()=>{
+
+document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+
+btn.classList.add("active");
+
+type=btn.dataset.type;
+
+renderFields();
+
+});
+
+});
+
+[fg,bg,size,margin,ecc,format].forEach(el=>{
+el.addEventListener("input",generate);
+el.addEventListener("change",generate);
+});
+
+download.addEventListener("click",async()=>{
+
+if(!data||!lastCanvas)return;
+
+if(format.value==="png"){
+
+const a=document.createElement("a");
+
+a.href=lastCanvas.toDataURL("image/png");
+a.download="qr-code.png";
+
+document.body.appendChild(a);
+a.click();
+a.remove();
+
+}else{
+
+try{
+
+const mod=await getQR();
+const QRCode=mod.default||mod;
+
+const svg=await QRCode.toString(data,{
+type:"svg",
+width:Number(size.value),
+margin:Number(margin.value),
+errorCorrectionLevel:eccValue(),
+color:{
+dark:fg.value,
+light:bg.value
+}
+});
+
+const blob=new Blob([svg],{
+type:"image/svg+xml"
+});
+
+const url=URL.createObjectURL(blob);
+
+const a=document.createElement("a");
+
+a.href=url;
+a.download="qr-code.svg";
+
+document.body.appendChild(a);
+a.click();
+a.remove();
+
+setTimeout(()=>{
+URL.revokeObjectURL(url);
+},1000);
+
+}catch(e){
+
+showError("Could not create the SVG file.");
+
+}
+
+}
+
+});
+
+copy.addEventListener("click",async()=>{
+
+if(!data)return;
+
+try{
+
+await navigator.clipboard.writeText(data);
+
+status.textContent="QR data copied to clipboard.";
+
+setTimeout(()=>{
+status.textContent=`${data.length.toLocaleString()} characters · ${Number(size.value)} × ${Number(size.value)} output`;
+},1800);
+
+}catch{
+
+showError("Clipboard access was blocked. Select and copy the data manually.");
+
+}
+
+});
+
+eccValue();
+renderFields();
+</script>
+</body>
+</html>

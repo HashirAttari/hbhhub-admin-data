@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Regex Tester</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:hsl(var(--background));color:hsl(var(--foreground))}
+body{min-height:100vh;padding:clamp(12px,3vw,36px)}
+button,textarea,input{font:inherit}
+button{cursor:pointer}
+.app{width:min(100%,1100px);margin:auto}
+.card{background:hsl(var(--card));color:hsl(var(--card-foreground));border:1px solid hsl(var(--border));border-radius:var(--radius);overflow:hidden}
+.header{padding:clamp(20px,4vw,30px);border-bottom:1px solid hsl(var(--border))}
+.eyebrow{margin:0 0 6px;color:hsl(var(--muted-foreground));font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+h1{margin:0;font-size:clamp(1.5rem,4vw,2rem);line-height:1.2}
+.subtitle{margin:8px 0 0;color:hsl(var(--muted-foreground));font-size:.9rem}
+.content{padding:clamp(16px,3vw,28px)}
+.field{display:flex;flex-direction:column;gap:8px}
+.label{font-size:.82rem;font-weight:700}
+.regex-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px}
+.input-wrap{display:flex;align-items:center;min-width:0;border:1px solid hsl(var(--input));border-radius:var(--radius);background:hsl(var(--background));overflow:hidden}
+.slash{padding:0 10px;color:hsl(var(--muted-foreground));font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:1rem}
+input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:hsl(var(--foreground));padding:12px 4px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9rem}
+.flags{display:flex;flex-wrap:wrap;gap:8px}
+.flag{position:relative;display:inline-flex;align-items:center;justify-content:center;min-width:42px;height:38px;padding:0 12px;border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--background));color:hsl(var(--muted-foreground));font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem;font-weight:700;cursor:pointer;user-select:none;transition:all .15s ease}
+.flag:hover{border-color:hsl(var(--primary)/.5);background:hsl(var(--muted))}
+.flag:has(input:checked){background:hsl(var(--primary));border-color:hsl(var(--primary));color:hsl(var(--primary-foreground))}
+.flag input{position:absolute;opacity:0;pointer-events:none;width:0;height:0}
+.flag:has(input:focus-visible){outline:2px solid hsl(var(--ring));outline-offset:2px}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.btn{min-height:42px;padding:9px 15px;border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--secondary));color:hsl(var(--secondary-foreground));font-weight:650;transition:.15s}
+.btn:hover:not(:disabled){background:hsl(var(--muted))}
+.btn:focus-visible,.flag:has(input:focus-visible),textarea:focus-visible,input:focus-visible{outline:2px solid hsl(var(--ring));outline-offset:2px}
+.btn.primary{background:hsl(var(--primary));border-color:hsl(var(--primary));color:hsl(var(--primary-foreground))}
+.btn.primary:hover:not(:disabled){background:hsl(var(--primary)/.88)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.section{margin-top:20px}
+textarea{width:100%;min-height:220px;resize:vertical;padding:14px;border:1px solid hsl(var(--input));border-radius:var(--radius);outline:0;background:hsl(var(--background));color:hsl(var(--foreground));font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88rem;line-height:1.6;tab-size:2}
+.result-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:9px}
+.result-title{margin:0;font-size:.95rem;font-weight:700}
+.badge{display:inline-flex;align-items:center;min-height:28px;padding:4px 9px;border-radius:999px;background:hsl(var(--muted));color:hsl(var(--muted-foreground));font-size:.76rem;font-weight:700}
+.badge.success{background:hsl(var(--success)/.12);color:hsl(var(--success))}
+.badge.error{background:hsl(var(--destructive)/.12);color:hsl(var(--destructive))}
+.preview{min-height:100px;padding:14px;border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--muted));font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88rem;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
+mark{background:hsl(var(--primary)/.2);color:inherit;border-radius:3px;padding:1px 2px}
+.match-list{margin-top:12px;border:1px solid hsl(var(--border));border-radius:var(--radius);overflow:hidden}
+.match{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:12px;padding:11px 13px;border-bottom:1px solid hsl(var(--border));font-size:.82rem;align-items:start}
+.match:last-child{border-bottom:0}
+.match-num{color:hsl(var(--muted-foreground));font-weight:700}
+.match-value{overflow-wrap:anywhere}
+.match-index{color:hsl(var(--muted-foreground));white-space:nowrap}
+.empty{padding:22px;text-align:center;color:hsl(var(--muted-foreground));font-size:.85rem}
+.error{margin-top:8px;color:hsl(var(--destructive));font-size:.82rem}
+.divider{height:1px;background:hsl(var(--border));margin:24px 0}
+@media(max-width:650px){
+ body{padding:10px}
+ .regex-row{grid-template-columns:1fr}
+ .content{padding:15px}
+ .actions .btn{flex:1}
+ .match{grid-template-columns:38px minmax(0,1fr)}
+ .match-index{grid-column:2}
+}
+</style>
+</head>
+<body>
+<main class="app">
+<section class="card">
+<header class="header">
+<p class="eyebrow">Developer Utility</p>
+<h1>Regex Tester</h1>
+<p class="subtitle">Test patterns, inspect matches, and preview exactly what your expression captures.</p>
+</header>
+
+<div class="content">
+<div class="field">
+<label class="label" for="pattern">Regular expression</label>
+<div class="regex-row">
+<div>
+<div class="input-wrap">
+<span class="slash">/</span>
+<input id="pattern" type="text" spellcheck="false" autocomplete="off" placeholder="e.g. \b[A-Z][a-z]+\b" aria-label="Regular expression">
+<span class="slash">/</span>
+</div>
+<div id="error" class="error" hidden></div>
+</div>
+<div class="flags" aria-label="Regex flags">
+<label class="flag"><input type="checkbox" value="g" checked> g</label>
+<label class="flag"><input type="checkbox" value="i"> i</label>
+<label class="flag"><input type="checkbox" value="m"> m</label>
+<label class="flag"><input type="checkbox" value="s"> s</label>
+<label class="flag"><input type="checkbox" value="u"> u</label>
+<label class="flag"><input type="checkbox" value="y"> y</label>
+</div>
+</div>
+</div>
+
+<div class="section field">
+<div class="result-head"><label class="label" for="testText">Test string</label><span id="count" class="badge">0 matches</span></div>
+<textarea id="testText" spellcheck="false" placeholder="Paste or type the text you want to test..."></textarea>
+</div>
+
+<div class="actions section">
+<button id="test" class="btn primary" type="button">Test Regex</button>
+<button id="sample" class="btn" type="button">Load Sample</button>
+<button id="clear" class="btn" type="button">Clear</button>
+<button id="copy" class="btn" type="button" disabled>Copy Matches</button>
+</div>
+
+<div class="divider"></div>
+
+<div class="section">
+<div class="result-head">
+<h2 class="result-title">Highlighted result</h2>
+<span id="state" class="badge">Waiting</span>
+</div>
+<div id="preview" class="preview">Enter a pattern and test string to see highlighted matches.</div>
+</div>
+
+<div class="section">
+<div class="result-head"><h2 class="result-title">Matches</h2></div>
+<div id="matches" class="match-list"><div class="empty">No matches yet.</div></div>
+</div>
+</div>
+</section>
+</main>
+
+<script>
+(()=>{"use strict";
+const pattern=document.getElementById("pattern"),text=document.getElementById("testText"),error=document.getElementById("error"),count=document.getElementById("count"),state=document.getElementById("state"),preview=document.getElementById("preview"),matches=document.getElementById("matches"),test=document.getElementById("test"),sample=document.getElementById("sample"),clear=document.getElementById("clear"),copy=document.getElementById("copy");
+let found=[];
+
+const escapeHtml=s=>s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const getFlags=()=>[...document.querySelectorAll('.flag input:checked')].map(x=>x.value).join("");
+const setState=(label,type="")=>{state.textContent=label;state.className="badge"+(type?" "+type:"")};
+
+function run(){
+ error.hidden=true;error.textContent="";found=[];copy.disabled=true;
+ let re;
+ try{re=new RegExp(pattern.value,getFlags())}
+ catch(e){error.textContent="Invalid regular expression: "+e.message;error.hidden=false;setState("Invalid","error");count.textContent="0 matches";preview.textContent="";matches.innerHTML='<div class="empty">Fix the expression and try again.</div>';return}
+ const source=text.value;
+ const flags=getFlags();
+ try{
+  if(flags.includes("g")||flags.includes("y")){
+   let m,guard=0;
+   while((m=re.exec(source))!==null){
+    found.push({value:m[0],index:m.index,groups:m.slice(1)});
+    if(m[0]===""&&++guard>source.length+1)break;
+   }
+  }else{
+   const m=re.exec(source);
+   if(m)found.push({value:m[0],index:m.index,groups:m.slice(1)});
+  }
+ }catch(e){error.textContent="Could not test expression: "+e.message;error.hidden=false;setState("Error","error");return}
+ render(source);
+}
+
+function render(source){
+ count.textContent=`${found.length} match${found.length===1?"":"es"}`;
+ setState(found.length?"Matches found":"No matches",found.length?"success":"");
+ if(!found.length){preview.innerHTML=source?escapeHtml(source):"No test string provided.";matches.innerHTML='<div class="empty">No matches found.</div>';copy.disabled=true;return}
+ let out="",cursor=0;
+ found.forEach(m=>{
+  out+=escapeHtml(source.slice(cursor,m.index));
+  out+="<mark>"+escapeHtml(m.value||"∅")+"</mark>";
+  cursor=m.index+m.value.length;
+ });
+ out+=escapeHtml(source.slice(cursor));
+ preview.innerHTML=out;
+ matches.innerHTML=found.map((m,i)=>`<div class="match"><span class="match-num">#${i+1}</span><span class="match-value">${escapeHtml(m.value||"∅")}</span><span class="match-index">index ${m.index}</span></div>`).join("");
+ copy.disabled=false;
+}
+
+const sampleText=`Hello Alice, please contact alice@example.com.
+Order #4821 was created on 2026-09-19.
+Our support team is available from 09:00 to 17:00.`;
+
+sample.addEventListener("click",()=>{pattern.value="\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\\b";text.value=sampleText;run()});
+test.addEventListener("click",run);
+pattern.addEventListener("input",run);
+text.addEventListener("input",run);
+document.querySelectorAll(".flag input").forEach(x=>x.addEventListener("change",run));
+clear.addEventListener("click",()=>{pattern.value="";text.value="";found=[];error.hidden=true;count.textContent="0 matches";setState("Waiting");preview.textContent="Enter a pattern and test string to see highlighted matches.";matches.innerHTML='<div class="empty">No matches yet.</div>';copy.disabled=true;pattern.focus()});
+copy.addEventListener("click",async()=>{
+ if(!found.length)return;
+ try{await navigator.clipboard.writeText(found.map((m,i)=>`#${i+1}  ${m.value}  (index ${m.index})`).join("\n"));copy.textContent="Copied";setTimeout(()=>copy.textContent="Copy Matches",1200)}
+ catch{copy.textContent="Copy failed";setTimeout(()=>copy.textContent="Copy Matches",1200)}
+});
+document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();run()}});
+})();
+</script>
+</body>
+</html>

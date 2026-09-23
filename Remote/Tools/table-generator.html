@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Table Generator</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:hsl(var(--background));color:hsl(var(--foreground))}
+body{min-height:100vh;padding:clamp(10px,3vw,32px)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{width:min(100%,1100px);margin:auto}
+.card{background:hsl(var(--card));color:hsl(var(--card-foreground));border:1px solid hsl(var(--border));border-radius:var(--radius);overflow:hidden}
+.header{padding:clamp(20px,4vw,30px);border-bottom:1px solid hsl(var(--border))}
+.eyebrow{margin:0 0 6px;color:hsl(var(--muted-foreground));font-size:.72rem;font-weight:750;letter-spacing:.08em;text-transform:uppercase}
+h1{margin:0;font-size:clamp(1.45rem,4vw,2rem);line-height:1.2}
+.subtitle{margin:8px 0 0;color:hsl(var(--muted-foreground));font-size:.9rem;line-height:1.5}
+.content{padding:clamp(14px,3vw,26px)}
+.toolbar{display:flex;align-items:end;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.controls{display:flex;gap:9px;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:6px}
+.label{font-size:.77rem;font-weight:700}
+.input,.select,.textarea{border:1px solid hsl(var(--input));border-radius:var(--radius);background:hsl(var(--background));color:hsl(var(--foreground));outline:0}
+.input,.select{height:40px;padding:7px 10px}
+.input:focus,.select:focus,.textarea:focus{outline:2px solid hsl(var(--ring));outline-offset:2px}
+.count-input{width:78px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{min-height:40px;padding:8px 14px;border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--secondary));color:hsl(var(--secondary-foreground));font-weight:650;transition:.15s}
+.btn:hover{background:hsl(var(--muted))}
+.btn.primary{background:hsl(var(--primary));border-color:hsl(var(--primary));color:hsl(var(--primary-foreground))}
+.btn.primary:hover{background:hsl(var(--primary)/.88)}
+.btn.danger{color:hsl(var(--destructive))}
+.btn:focus-visible{outline:2px solid hsl(var(--ring));outline-offset:2px}
+.editor{margin-top:18px;border:1px solid hsl(var(--border));border-radius:var(--radius);overflow:auto;background:hsl(var(--background))}
+.editor-table{width:100%;border-collapse:collapse;min-width:520px}
+.editor-table th,.editor-table td{padding:0;border-right:1px solid hsl(var(--border));border-bottom:1px solid hsl(var(--border))}
+.editor-table th:last-child,.editor-table td:last-child{border-right:0}
+.editor-table tr:last-child td{border-bottom:0}
+.cell{display:block;width:100%;min-width:110px;height:44px;padding:10px;border:0;outline:0;background:transparent;color:hsl(var(--foreground));font-size:.85rem}
+.cell:focus{background:hsl(var(--primary)/.06);box-shadow:inset 0 0 0 2px hsl(var(--ring))}
+.header-cell{background:hsl(var(--muted));font-weight:700}
+.section-title{margin:24px 0 10px;font-size:.92rem;font-weight:750}
+.preview{border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--background));overflow:auto;padding:16px}
+.preview-table{width:100%;border-collapse:collapse}
+.preview-table th,.preview-table td{padding:10px 12px;border:1px solid hsl(var(--border));text-align:left}
+.preview-table th{background:hsl(var(--muted));font-weight:700}
+.preview-empty{padding:20px;text-align:center;color:hsl(var(--muted-foreground));font-size:.85rem}
+.code-area{position:relative}
+.textarea{display:block;width:100%;min-height:230px;padding:14px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;line-height:1.6}
+.code-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+.status{margin-top:10px;color:hsl(var(--muted-foreground));font-size:.78rem}
+@media(max-width:650px){
+body{padding:8px}
+.content{padding:14px}
+.toolbar{align-items:stretch}
+.controls{width:100%}
+.controls .field{flex:1}
+.controls .input,.controls .select{width:100%}
+.actions{width:100%}
+.actions .btn{flex:1}
+.preview{padding:10px}
+}
+</style>
+</head>
+<body>
+<main class="app">
+<section class="card">
+<header class="header">
+<p class="eyebrow">Table Utility</p>
+<h1>Table Generator</h1>
+<p class="subtitle">Create tables visually and switch between clean HTML and Markdown output instantly.</p>
+</header>
+
+<div class="content">
+<div class="toolbar">
+<div class="controls">
+<div class="field">
+<label class="label" for="format">Format</label>
+<select id="format" class="select">
+<option value="html">HTML</option>
+<option value="markdown">Markdown</option>
+</select>
+</div>
+
+<div class="field">
+<label class="label" for="rows">Rows</label>
+<input id="rows" class="input count-input" type="number" min="1" max="20" value="3">
+</div>
+
+<div class="field">
+<label class="label" for="columns">Columns</label>
+<input id="columns" class="input count-input" type="number" min="1" max="12" value="3">
+</div>
+
+<div class="field" id="headerField">
+<label class="label" for="headerMode">Header</label>
+<select id="headerMode" class="select">
+<option value="yes">First row</option>
+<option value="no">No header</option>
+</select>
+</div>
+
+<div class="field" id="alignmentField" hidden>
+<label class="label" for="alignment">Alignment</label>
+<select id="alignment" class="select">
+<option value="left">Left</option>
+<option value="center">Center</option>
+<option value="right">Right</option>
+</select>
+</div>
+</div>
+
+<div class="actions">
+<button id="generate" class="btn primary" type="button">Generate</button>
+<button id="sample" class="btn" type="button">Sample</button>
+<button id="clear" class="btn danger" type="button">Clear</button>
+</div>
+</div>
+
+<div id="editor" class="editor"></div>
+
+<h2 class="section-title">Live Preview</h2>
+<div id="preview" class="preview"></div>
+
+<h2 class="section-title" id="outputTitle">HTML Output</h2>
+<div class="code-area">
+<textarea id="output" class="textarea" readonly spellcheck="false"></textarea>
+<div class="code-actions">
+<button id="copy" class="btn primary" type="button">Copy HTML</button>
+</div>
+</div>
+
+<div id="status" class="status"></div>
+</div>
+</section>
+</main>
+
+<script>
+(function(){
+"use strict";
+
+const format=document.getElementById("format");
+const rowsInput=document.getElementById("rows");
+const colsInput=document.getElementById("columns");
+const headerMode=document.getElementById("headerMode");
+const alignment=document.getElementById("alignment");
+const headerField=document.getElementById("headerField");
+const alignmentField=document.getElementById("alignmentField");
+const generateBtn=document.getElementById("generate");
+const sampleBtn=document.getElementById("sample");
+const clearBtn=document.getElementById("clear");
+const editor=document.getElementById("editor");
+const preview=document.getElementById("preview");
+const output=document.getElementById("output");
+const copyBtn=document.getElementById("copy");
+const outputTitle=document.getElementById("outputTitle");
+const status=document.getElementById("status");
+
+let tableData=[];
+
+function getDimensions(){
+let rows=parseInt(rowsInput.value,10);
+let cols=parseInt(colsInput.value,10);
+
+if(!Number.isFinite(rows))rows=3;
+if(!Number.isFinite(cols))cols=3;
+
+rows=Math.max(1,Math.min(20,rows));
+cols=Math.max(1,Math.min(12,cols));
+
+rowsInput.value=rows;
+colsInput.value=cols;
+
+return {rows,cols};
+}
+
+function escapeHtml(value){
+return String(value)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#39;");
+}
+
+function escapeMarkdown(value){
+return String(value)
+.replace(/\\/g,"\\\\")
+.replace(/\|/g,"\\|")
+.replace(/\r?\n/g,"<br>");
+}
+
+function createData(rows,cols,preserve){
+const next=[];
+
+for(let r=0;r<rows;r++){
+next[r]=[];
+
+for(let c=0;c<cols;c++){
+if(preserve&&tableData[r]&&tableData[r][c]!==undefined){
+next[r][c]=tableData[r][c];
+}else if(r===0&&headerMode.value==="yes"){
+next[r][c]="Header "+(c+1);
+}else{
+next[r][c]="Cell "+(r+1)+"-"+(c+1);
+}
+}
+}
+
+tableData=next;
+}
+
+function buildEditor(preserve){
+const {rows,cols}=getDimensions();
+createData(rows,cols,preserve);
+
+const table=document.createElement("table");
+table.className="editor-table";
+
+const tbody=document.createElement("tbody");
+
+for(let r=0;r<rows;r++){
+const tr=document.createElement("tr");
+
+for(let c=0;c<cols;c++){
+const isHeader=headerMode.value==="yes"&&r===0;
+const cell=document.createElement(isHeader?"th":"td");
+const input=document.createElement("input");
+
+input.type="text";
+input.className="cell"+(isHeader?" header-cell":"");
+input.value=tableData[r][c];
+input.setAttribute("aria-label",(isHeader?"Header ":"Cell ")+(r+1)+", column "+(c+1));
+
+input.addEventListener("input",function(){
+tableData[r][c]=input.value;
+refresh();
+});
+
+cell.appendChild(input);
+tr.appendChild(cell);
+}
+
+tbody.appendChild(tr);
+}
+
+table.appendChild(tbody);
+editor.replaceChildren(table);
+refresh();
+}
+
+function getAlignment(){
+return alignment.value==="center"?"center":alignment.value==="right"?"right":"left";
+}
+
+function createPreview(){
+preview.replaceChildren();
+
+if(!tableData.length){
+const empty=document.createElement("div");
+empty.className="preview-empty";
+empty.textContent="No table data.";
+preview.appendChild(empty);
+return;
+}
+
+const table=document.createElement("table");
+table.className="preview-table";
+
+const hasHeader=headerMode.value==="yes";
+const align=getAlignment();
+
+if(hasHeader){
+const thead=document.createElement("thead");
+const tr=document.createElement("tr");
+
+tableData[0].forEach(function(value){
+const th=document.createElement("th");
+th.textContent=value;
+th.style.textAlign=align;
+tr.appendChild(th);
+});
+
+thead.appendChild(tr);
+table.appendChild(thead);
+}
+
+const start=hasHeader?1:0;
+
+if(start<tableData.length){
+const tbody=document.createElement("tbody");
+
+for(let r=start;r<tableData.length;r++){
+const tr=document.createElement("tr");
+
+tableData[r].forEach(function(value){
+const td=document.createElement("td");
+td.textContent=value;
+td.style.textAlign=align;
+tr.appendChild(td);
+});
+
+tbody.appendChild(tr);
+}
+
+table.appendChild(tbody);
+}
+
+preview.appendChild(table);
+}
+
+function createHtml(){
+if(!tableData.length)return"";
+
+const hasHeader=headerMode.value==="yes";
+let html="<table>\n";
+
+if(hasHeader){
+html+="  <thead>\n    <tr>\n";
+
+tableData[0].forEach(function(value){
+html+="      <th>"+escapeHtml(value)+"</th>\n";
+});
+
+html+="    </tr>\n  </thead>\n";
+}
+
+const start=hasHeader?1:0;
+
+if(start<tableData.length){
+html+="  <tbody>\n";
+
+for(let r=start;r<tableData.length;r++){
+html+="    <tr>\n";
+
+tableData[r].forEach(function(value){
+html+="      <td>"+escapeHtml(value)+"</td>\n";
+});
+
+html+="    </tr>\n";
+}
+
+html+="  </tbody>\n";
+}
+
+html+="</table>";
+return html;
+}
+
+function createMarkdown(){
+if(!tableData.length)return"";
+
+const separator=alignment.value==="center"?":---:":alignment.value==="right"?"---:":"---";
+const hasHeader=headerMode.value==="yes";
+let lines=[];
+
+if(hasHeader){
+lines.push("| "+tableData[0].map(escapeMarkdown).join(" | ")+" |");
+lines.push("| "+tableData[0].map(function(){return separator}).join(" | ")+" |");
+
+for(let r=1;r<tableData.length;r++){
+lines.push("| "+tableData[r].map(escapeMarkdown).join(" | ")+" |");
+}
+}else{
+const cols=tableData[0]?tableData[0].length:0;
+const first=tableData[0]||[];
+
+lines.push("| "+first.map(escapeMarkdown).join(" | ")+" |");
+lines.push("| "+Array(cols).fill(separator).join(" | ")+" |");
+
+for(let r=1;r<tableData.length;r++){
+lines.push("| "+tableData[r].map(escapeMarkdown).join(" | ")+" |");
+}
+}
+
+return lines.join("\n");
+}
+
+function refresh(){
+createPreview();
+
+const isHtml=format.value==="html";
+const result=isHtml?createHtml():createMarkdown();
+
+output.value=result;
+outputTitle.textContent=isHtml?"HTML Output":"Markdown Output";
+copyBtn.textContent=isHtml?"Copy HTML":"Copy Markdown";
+
+const rows=tableData.length;
+const cols=tableData[0]?tableData[0].length:0;
+status.textContent=rows+" rows × "+cols+" columns • "+(isHtml?"HTML":"Markdown");
+}
+
+function updateFormatUI(){
+const isHtml=format.value==="html";
+
+headerField.hidden=false;
+alignmentField.hidden=isHtml;
+headerMode.value=isHtml&&headerMode.value==="no"?"yes":headerMode.value;
+
+refresh();
+}
+
+function generate(){
+buildEditor(true);
+const first=editor.querySelector("input");
+if(first)first.focus();
+}
+
+function loadSample(){
+format.value="html";
+rowsInput.value=5;
+colsInput.value=4;
+headerMode.value="yes";
+alignment.value="left";
+
+tableData=[
+["Name","Role","Department","Status"],
+["Ayesha Khan","Designer","Product","Active"],
+["Hamza Ali","Developer","Engineering","Active"],
+["Sara Ahmed","Manager","Marketing","Pending"],
+["Usman Raza","Analyst","Finance","Active"]
+];
+
+buildEditor(true);
+updateFormatUI();
+}
+
+function clearTable(){
+const {rows,cols}=getDimensions();
+
+tableData=[];
+
+for(let r=0;r<rows;r++){
+tableData[r]=[];
+
+for(let c=0;c<cols;c++){
+tableData[r][c]="";
+}
+}
+
+buildEditor(true);
+
+const first=editor.querySelector("input");
+if(first)first.focus();
+}
+
+async function copyOutput(){
+if(!output.value)return;
+
+try{
+await navigator.clipboard.writeText(output.value);
+copyBtn.textContent="Copied";
+
+setTimeout(function(){
+copyBtn.textContent=format.value==="html"?"Copy HTML":"Copy Markdown";
+},1200);
+}catch(error){
+output.focus();
+output.select();
+
+try{
+document.execCommand("copy");
+copyBtn.textContent="Copied";
+}catch(e){
+copyBtn.textContent="Copy failed";
+}
+
+setTimeout(function(){
+copyBtn.textContent=format.value==="html"?"Copy HTML":"Copy Markdown";
+},1200);
+}
+}
+
+format.addEventListener("change",function(){
+updateFormatUI();
+buildEditor(true);
+});
+
+generateBtn.addEventListener("click",generate);
+sampleBtn.addEventListener("click",loadSample);
+clearBtn.addEventListener("click",clearTable);
+copyBtn.addEventListener("click",copyOutput);
+
+rowsInput.addEventListener("change",function(){
+buildEditor(true);
+});
+
+colsInput.addEventListener("change",function(){
+buildEditor(true);
+});
+
+headerMode.addEventListener("change",function(){
+buildEditor(true);
+});
+
+alignment.addEventListener("change",refresh);
+
+document.addEventListener("keydown",function(event){
+if((event.ctrlKey||event.metaKey)&&event.key==="Enter"){
+event.preventDefault();
+generate();
+}
+});
+
+buildEditor(false);
+updateFormatUI();
+
+})();
+</script>
+</body>
+</html>

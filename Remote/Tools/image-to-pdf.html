@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Image to PDF</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:hsl(var(--background));color:hsl(var(--foreground))}button,input,select{font:inherit}button{cursor:pointer}.app{width:min(1080px,100%);margin:auto;padding:clamp(18px,4vw,42px) clamp(12px,4vw,28px)}.hero{margin-bottom:22px}.eyebrow{display:inline-flex;align-items:center;gap:7px;color:hsl(var(--primary));font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em}.eyebrow i{width:7px;height:7px;border-radius:50%;background:hsl(var(--primary))}.hero h1{font-size:clamp(29px,5vw,43px);line-height:1.05;letter-spacing:-.04em;margin:8px 0}.hero p{margin:0;max-width:700px;color:hsl(var(--muted-foreground));font-size:14px;line-height:1.6}.panel{background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:calc(var(--radius) + 6px);box-shadow:0 15px 45px hsl(var(--foreground)/.06);overflow:hidden}.drop{margin:18px;border:2px dashed hsl(var(--border));border-radius:var(--radius);padding:clamp(30px,6vw,52px) 18px;text-align:center;transition:.2s}.drop.drag{border-color:hsl(var(--primary));background:hsl(var(--primary)/.07)}.icon{width:54px;height:54px;margin:0 auto 14px;border-radius:16px;background:hsl(var(--primary)/.1);color:hsl(var(--primary));display:grid;place-items:center;font-size:25px}.drop h2{margin:0 0 6px;font-size:19px}.drop p{margin:0 0 17px;color:hsl(var(--muted-foreground));font-size:13px}.btn{border:1px solid hsl(var(--border));background:hsl(var(--secondary));color:hsl(var(--secondary-foreground));padding:10px 16px;border-radius:calc(var(--radius) - 2px);font-weight:750;font-size:13px;transition:.15s}.btn:hover{filter:brightness(.97)}.btn.primary{background:hsl(var(--primary));color:hsl(var(--primary-foreground));border-color:hsl(var(--primary))}.btn:disabled{opacity:.5;cursor:not-allowed}.body{display:none;padding:0 18px 18px}.body.show{display:block}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.count{font-size:13px;font-weight:750}.hint{font-size:11px;color:hsl(var(--muted-foreground));margin-top:3px}.toolbar-actions{display:flex;gap:7px}.images{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}.card{position:relative;border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--background)/.35);overflow:hidden;cursor:grab}.card.dragging{opacity:.45;border-color:hsl(var(--primary))}.thumb{height:145px;background:hsl(var(--secondary));display:grid;place-items:center;overflow:hidden}.thumb img{width:100%;height:100%;object-fit:contain}.card-info{padding:9px 10px}.name{font-size:12px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meta{font-size:10px;color:hsl(var(--muted-foreground));margin-top:3px}.num{position:absolute;top:7px;left:7px;background:hsl(var(--foreground)/.78);color:hsl(var(--background));font-size:10px;font-weight:800;border-radius:6px;padding:4px 6px}.remove{position:absolute;top:6px;right:6px;width:28px;height:28px;border:0;border-radius:7px;background:hsl(var(--background)/.88);color:hsl(var(--foreground));font-size:17px}.settings{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.box{border:1px solid hsl(var(--border));border-radius:var(--radius);padding:14px}.box h3{font-size:13px;margin:0 0 4px}.box p{font-size:11px;color:hsl(var(--muted-foreground));margin:0 0 11px;line-height:1.45}.select{width:100%;padding:9px;border:1px solid hsl(var(--input));border-radius:calc(var(--radius) - 2px);background:hsl(var(--background));color:hsl(var(--foreground));outline:none}.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px}.check{display:flex;align-items:center;gap:7px;font-size:12px;color:hsl(var(--muted-foreground))}.check input{accent-color:hsl(var(--primary))}.footer{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid hsl(var(--border))}.summary{font-size:12px;color:hsl(var(--muted-foreground))}.progress{display:none;margin-top:13px}.progress.show{display:block}.ptop{display:flex;justify-content:space-between;font-size:12px;font-weight:750;margin-bottom:7px}.track{height:7px;border-radius:20px;background:hsl(var(--secondary));overflow:hidden}.track i{display:block;width:0;height:100%;background:hsl(var(--primary));transition:width .2s}.result{display:none;margin-top:14px;border:1px solid hsl(var(--success)/.35);background:hsl(var(--success)/.07);border-radius:var(--radius);padding:14px}.result.show{display:block}.result-row{display:flex;justify-content:space-between;align-items:center;gap:14px}.result h3{margin:0;font-size:14px}.result p{margin:4px 0 0;color:hsl(var(--muted-foreground));font-size:12px}.error{display:none;margin-top:12px;border:1px solid hsl(var(--primary)/.3);background:hsl(var(--primary)/.06);border-radius:var(--radius);padding:12px;font-size:12px;line-height:1.5}.error.show{display:block}.note{text-align:center;color:hsl(var(--muted-foreground));font-size:11px;line-height:1.55;margin:15px auto 0;max-width:760px}@media(max-width:650px){.settings{grid-template-columns:1fr}.result-row,.footer,.toolbar{align-items:stretch;flex-direction:column}.footer .btn,.result-row .btn,.toolbar-actions{width:100%}.toolbar-actions .btn{flex:1}}@media(max-width:420px){.app{padding:17px 10px}.drop{margin:10px;padding:29px 13px}.body{padding:0 10px 10px}.images{grid-template-columns:repeat(2,minmax(0,1fr))}.thumb{height:115px}.checks{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="app">
+<section class="hero">
+<div class="eyebrow"><i></i> Local PDF utility</div>
+<h1>Turn images into PDF.</h1>
+<p>Combine JPG, JPEG, PNG and WebP images into a polished PDF. Arrange pages, choose the paper size, and export everything locally in your browser.</p>
+</section>
+
+<section class="panel">
+<div class="drop" id="drop">
+<div class="icon">＋</div>
+<h2>Drop your images here</h2>
+<p>Add one or multiple images. You can reorder them before creating the PDF.</p>
+<button class="btn primary" id="choose" type="button">Choose images</button>
+<input id="input" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" multiple hidden>
+</div>
+
+<div class="body" id="body">
+<div class="toolbar">
+<div><div class="count" id="count">0 images</div><div class="hint">Drag images to change page order.</div></div>
+<div class="toolbar-actions"><button class="btn" id="add" type="button">＋ Add images</button><button class="btn" id="clear" type="button">Clear all</button></div>
+</div>
+
+<div class="images" id="images"></div>
+
+<div class="settings">
+<div class="box">
+<h3>Page size</h3>
+<p>Choose the PDF paper size used for every page.</p>
+<select class="select" id="size">
+<option value="a4">A4</option>
+<option value="letter">US Letter</option>
+<option value="a5">A5</option>
+<option value="fit">Fit to image</option>
+</select>
+</div>
+<div class="box">
+<h3>Image placement</h3>
+<p>Control how each image fits inside the PDF page.</p>
+<select class="select" id="fit">
+<option value="contain">Fit image — no cropping</option>
+<option value="cover">Fill page — crop edges</option>
+<option value="stretch">Stretch to page</option>
+</select>
+</div>
+<div class="box">
+<h3>Orientation</h3>
+<p>Use automatic orientation or force every page.</p>
+<select class="select" id="orientation">
+<option value="auto">Automatic</option>
+<option value="portrait">Portrait</option>
+<option value="landscape">Landscape</option>
+</select>
+</div>
+<div class="box">
+<h3>Page margins</h3>
+<p>Keep a clean border around your images.</p>
+<select class="select" id="margin">
+<option value="0">No margin</option>
+<option value="12">Small — 12 pt</option>
+<option value="24" selected>Normal — 24 pt</option>
+<option value="40">Large — 40 pt</option>
+</select>
+</div>
+</div>
+
+<div class="box" style="margin-top:12px">
+<h3>Output</h3>
+<p>Optional finishing settings.</p>
+<div class="checks">
+<label class="check"><input type="checkbox" id="metadata" checked> Add PDF metadata</label>
+<label class="check"><input type="checkbox" id="quality" checked> Preserve image quality</label>
+</div>
+</div>
+
+<div class="footer">
+<div class="summary" id="summary"></div>
+<button class="btn primary" id="make" type="button" disabled>Create PDF</button>
+</div>
+
+<div class="progress" id="progress">
+<div class="ptop"><span id="pct">0%</span><span id="stage">Preparing…</span></div>
+<div class="track"><i id="bar"></i></div>
+</div>
+
+<div class="result" id="result">
+<div class="result-row">
+<div><h3>PDF ready</h3><p id="resultMeta"></p></div>
+<button class="btn primary" id="download" type="button">Download PDF</button>
+</div>
+</div>
+
+<div class="error" id="error"></div>
+</div>
+</section>
+
+<div class="note">Images are processed locally in your browser. Nothing is uploaded to a server.</div>
+</main>
+
+<script type="module">
+const PDFLIB="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm";
+let PDFLib=null,items=[],output=null;
+
+const $=id=>document.getElementById(id);
+const input=$("input"),choose=$("choose"),add=$("add"),drop=$("drop"),body=$("body"),images=$("images"),count=$("count"),summary=$("summary"),clear=$("clear"),make=$("make"),size=$("size"),fit=$("fit"),orientation=$("orientation"),margin=$("margin"),metadata=$("metadata"),quality=$("quality"),progress=$("progress"),bar=$("bar"),pct=$("pct"),stage=$("stage"),result=$("result"),resultMeta=$("resultMeta"),download=$("download"),errorBox=$("error");
+
+const fmt=n=>n<1024?n+" B":n<1048576?(n/1024).toFixed(1)+" KB":(n/1048576).toFixed(2)+" MB";
+
+function showError(msg){errorBox.textContent=msg;errorBox.classList.add("show")}
+function clearError(){errorBox.classList.remove("show");errorBox.textContent=""}
+
+function valid(f){return f&&((f.type||"").startsWith("image/")||/\.(jpe?g|png|webp)$/i.test(f.name))}
+function addFiles(list){
+ clearError();
+ const fresh=[...list].filter(valid);
+ if(!fresh.length)return showError("Please choose JPG, PNG or WebP images.");
+ fresh.forEach(file=>{
+  items.push({file,id:crypto.randomUUID(),url:URL.createObjectURL(file)});
+ });
+ render();
+}
+
+choose.onclick=()=>input.click();
+add.onclick=()=>input.click();
+input.onchange=()=>{if(input.files.length)addFiles(input.files);input.value=""};
+
+["dragenter","dragover"].forEach(e=>drop.addEventListener(e,x=>{x.preventDefault();drop.classList.add("drag")}));
+["dragleave","drop"].forEach(e=>drop.addEventListener(e,x=>{x.preventDefault();drop.classList.remove("drag")}));
+drop.addEventListener("drop",e=>{if(e.dataTransfer.files.length)addFiles(e.dataTransfer.files)});
+drop.addEventListener("click",e=>{if(e.target===drop||e.target.closest(".icon"))input.click()});
+
+clear.onclick=()=>{
+ items.forEach(x=>URL.revokeObjectURL(x.url));
+ items=[];output=null;result.classList.remove("show");render();
+};
+
+function render(){
+ body.classList.toggle("show",items.length>0);
+ images.innerHTML="";
+ items.forEach((item,i)=>{
+  const card=document.createElement("div");
+  card.className="card";card.draggable=true;card.dataset.id=item.id;
+  card.innerHTML=`<span class="num">${i+1}</span><button class="remove" type="button" title="Remove">×</button><div class="thumb"><img alt=""></div><div class="card-info"><div class="name"></div><div class="meta"></div></div>`;
+  card.querySelector("img").src=item.url;
+  card.querySelector("img").alt=item.file.name;
+  card.querySelector(".name").textContent=item.file.name;
+  card.querySelector(".meta").textContent=fmt(item.file.size);
+  card.querySelector(".remove").onclick=()=>{
+   URL.revokeObjectURL(item.url);items.splice(i,1);render();
+  };
+  card.addEventListener("dragstart",()=>card.classList.add("dragging"));
+  card.addEventListener("dragend",()=>{card.classList.remove("dragging");syncOrder()});
+  card.addEventListener("dragover",e=>{
+   e.preventDefault();
+   const dragging=images.querySelector(".dragging");
+   if(!dragging||dragging===card)return;
+   const r=card.getBoundingClientRect();
+   images.insertBefore(dragging,e.clientY>r.top+r.height/2?card.nextSibling:card);
+  });
+  images.appendChild(card);
+ });
+ count.textContent=`${items.length} image${items.length===1?"":"s"}`;
+ summary.innerHTML=items.length?`<strong>${items.length}</strong> page${items.length===1?"":"s"} · <strong>${fmt(items.reduce((n,x)=>n+x.file.size,0))}</strong> source images`:"";
+ make.disabled=items.length===0;
+}
+
+function syncOrder(){
+ const ids=[...images.children].map(x=>x.dataset.id);
+ items.sort((a,b)=>ids.indexOf(a.id)-ids.indexOf(b.id));
+ render();
+}
+
+async function loadPDFLib(){if(PDFLib)return PDFLib;PDFLib=await import(PDFLIB);return PDFLib}
+
+function setProgress(v,s){
+ progress.classList.add("show");
+ bar.style.width=v+"%";pct.textContent=Math.round(v)+"%";stage.textContent=s;
+}
+
+function pageSize(name){
+ if(name==="a4")return[595.28,841.89];
+ if(name==="letter")return[612,792];
+ if(name==="a5")return[419.53,595.28];
+ return null;
+}
+
+async function imageInfo(file){
+ const url=URL.createObjectURL(file);
+ try{
+  const img=await new Promise((resolve,reject)=>{
+   const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=url;
+  });
+  return{w:img.naturalWidth,h:img.naturalHeight};
+ }finally{URL.revokeObjectURL(url)}
+}
+
+async function createPDF(){
+ if(!items.length)return;
+ clearError();result.classList.remove("show");make.disabled=true;
+ try{
+  const {PDFDocument,rgb}=await loadPDFLib();
+  const pdf=await PDFDocument.create();
+  if(metadata.checked){
+   pdf.setTitle("Images to PDF");
+   pdf.setCreator("Image to PDF");
+   pdf.setProducer("PDF");
+   pdf.setCreationDate(new Date());
+  }
+
+  for(let i=0;i<items.length;i++){
+   const item=items[i];
+   setProgress((i/items.length)*90,`Processing image ${i+1} of ${items.length}…`);
+   const bytes=new Uint8Array(await item.file.arrayBuffer());
+   let embedded;
+
+   try{
+    if(item.file.type==="image/png"||/\.png$/i.test(item.file.name))embedded=await pdf.embedPng(bytes);
+    else if(item.file.type==="image/webp"||/\.webp$/i.test(item.file.name)){
+     const info=await imageInfo(item.file);
+     const canvas=document.createElement("canvas");
+     canvas.width=info.w;canvas.height=info.h;
+     const ctx=canvas.getContext("2d");
+     const img=new Image();
+     const url=URL.createObjectURL(item.file);
+     await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url});
+     ctx.drawImage(img,0,0);URL.revokeObjectURL(url);
+     const blob=await new Promise(r=>canvas.toBlob(r,"image/jpeg",quality.checked?.94:.82));
+     embedded=await pdf.embedJpg(new Uint8Array(await blob.arrayBuffer()));
+    }else embedded=await pdf.embedJpg(bytes);
+   }catch(e){
+    throw new Error(`Could not process "${item.file.name}". The image may be damaged or unsupported.`);
+   }
+
+   const info=await imageInfo(item.file);
+   let ps=pageSize(size.value);
+   let pw,ph;
+
+   if(!ps){
+    const factor=595/info.w;
+    pw=Math.max(1,info.w*factor);
+    ph=Math.max(1,info.h*factor);
+   }else{
+    [pw,ph]=ps;
+    const orient=orientation.value==="auto"?(info.w>info.h?"landscape":"portrait"):orientation.value;
+    if(orient==="landscape"&&ph>pw)[pw,ph]=[ph,pw];
+    if(orient==="portrait"&&pw>ph)[pw,ph]=[ph,pw];
+   }
+
+   const m=Number(margin.value);
+   const page=pdf.addPage([pw,ph]);
+   const boxW=Math.max(1,pw-m*2),boxH=Math.max(1,ph-m*2);
+
+   let dw=boxW,dh=boxH;
+   if(fit.value!=="stretch"){
+    const ratio=info.w/info.h;
+    if(fit.value==="contain"){
+     const r=Math.min(boxW/info.w,boxH/info.h);
+     dw=info.w*r;dh=info.h*r;
+    }else{
+     const r=Math.max(boxW/info.w,boxH/info.h);
+     dw=info.w*r;dh=info.h*r;
+    }
+   }
+
+   const x=m+(boxW-dw)/2,y=m+(boxH-dh)/2;
+   const opts={x,y,width:dw,height:dh};
+   if(fit.value==="cover"){
+    const r=Math.max(boxW/info.w,boxH/info.h);
+    const scaledW=info.w*r,scaledH=info.h*r;
+    opts.x=m+(boxW-scaledW)/2;opts.y=m+(boxH-scaledH)/2;opts.width=scaledW;opts.height=scaledH;
+   }
+   page.drawImage(embedded,opts);
+   await new Promise(r=>setTimeout(r,0));
+  }
+
+  setProgress(94,"Creating final PDF…");
+  const bytes=await pdf.save({useObjectStreams:true,addDefaultPage:false});
+  output=new Blob([bytes],{type:"application/pdf"});
+  resultMeta.textContent=`${items.length} image${items.length===1?"":"s"} · ${pdf.getPageCount()} page${pdf.getPageCount()===1?"":"s"} · ${fmt(bytes.length)}`;
+  setProgress(100,"PDF ready");
+  result.classList.add("show");
+ }catch(e){
+  console.error(e);setProgress(0,"Failed");showError(e.message||"Could not create the PDF.");
+ }finally{make.disabled=items.length===0}
+}
+
+make.onclick=createPDF;
+
+download.onclick=()=>{
+ if(!output)return;
+ const url=URL.createObjectURL(output),a=document.createElement("a");
+ a.href=url;a.download="images.pdf";document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1500);
+};
+
+render();
+</script>
+</body>
+</html>

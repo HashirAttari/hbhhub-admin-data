@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON Formatter</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 32px;
+      font-family: Arial, sans-serif;
+      background: hsl(var(--background));
+      color: hsl(var(--foreground));
+    }
+
+    .tool {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .card {
+      padding: 28px;
+      border: 1px solid hsl(var(--border));
+      border-radius: var(--radius);
+      background: hsl(var(--card));
+      color: hsl(var(--card-foreground));
+      box-shadow: 0 10px 30px hsl(var(--foreground) / 0.08);
+    }
+
+    .header {
+      margin-bottom: 24px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: var(--radius);
+      background: hsl(var(--secondary));
+      color: hsl(var(--secondary-foreground));
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    h1 {
+      margin: 14px 0 8px;
+      color: hsl(var(--primary));
+      font-size: 28px;
+    }
+
+    .description {
+      margin: 0;
+      color: hsl(var(--muted-foreground));
+      line-height: 1.6;
+    }
+
+    .editor {
+      width: 100%;
+      min-height: 320px;
+      resize: vertical;
+      padding: 16px;
+      border: 1px solid hsl(var(--border));
+      border-radius: var(--radius);
+      outline: none;
+
+      background: hsl(var(--background));
+      color: hsl(var(--foreground));
+
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .editor:focus {
+      border-color: hsl(var(--primary));
+      box-shadow: 0 0 0 3px hsl(var(--primary) / 0.12);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      border: 1px solid hsl(var(--border));
+      border-radius: var(--radius);
+      padding: 10px 16px;
+      cursor: pointer;
+
+      background: hsl(var(--primary));
+      color: hsl(var(--primary-foreground));
+
+      font-weight: 600;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button.secondary {
+      background: hsl(var(--secondary));
+      color: hsl(var(--secondary-foreground));
+    }
+
+    button.danger {
+      background: hsl(var(--destructive, 0 70% 50%));
+      color: hsl(var(--destructive-foreground, 0 0% 100%));
+    }
+
+    .status {
+      display: none;
+      margin-top: 18px;
+      padding: 13px 15px;
+      border-radius: var(--radius);
+      border: 1px solid hsl(var(--border));
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .status.success {
+      display: block;
+      border-color: hsl(var(--success));
+      background: hsl(var(--success) / 0.12);
+      color: hsl(var(--foreground));
+    }
+
+    .status.error {
+      display: block;
+      border-color: hsl(var(--destructive, 0 70% 50%));
+      background: hsl(var(--destructive, 0 70% 50%) / 0.10);
+      color: hsl(var(--foreground));
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .stat {
+      padding: 14px;
+      border: 1px solid hsl(var(--border));
+      border-radius: var(--radius);
+      background: hsl(var(--background));
+    }
+
+    .stat-label {
+      color: hsl(var(--muted-foreground));
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      color: hsl(var(--primary));
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .footer {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid hsl(var(--border));
+      color: hsl(var(--muted-foreground));
+      font-size: 12px;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 16px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar button {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="tool">
+    <div class="card">
+      <div class="header">
+        <h1>JSON Formatter & Validator</h1>
+        <p class="description">
+          Format, validate, minify and copy JSON directly inside the
+          remote tool. Theme colors are inherited from the parent loader.
+        </p>
+      </div>
+      <textarea id="jsonInput" class="editor" spellcheck="false" placeholder='Paste JSON here...
+
+Example:
+{
+  "name": "Remote Tool",
+  "status": "active",
+  "features": [
+    "format",
+    "validate",
+    "minify"
+  ]
+}'></textarea>
+      <div class="toolbar">
+        <button onclick="formatJSON()">Format</button>
+        <button class="secondary" onclick="minifyJSON()">Minify</button>
+        <button class="secondary" onclick="validateJSON()">Validate</button>
+        <button class="secondary" onclick="copyJSON()">Copy</button>
+        <button class="danger" onclick="clearJSON()">Clear</button>
+      </div>
+      <div id="status" class="status"></div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Characters</div>
+          <div id="charCount" class="stat-value">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Lines</div>
+          <div id="lineCount" class="stat-value">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Status</div>
+          <div id="jsonStatus" class="stat-value">Empty</div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script>
+    const input = document.getElementById("jsonInput");
+    const status = document.getElementById("status");
+    const charCount = document.getElementById("charCount");
+    const lineCount = document.getElementById("lineCount");
+    const jsonStatus = document.getElementById("jsonStatus");
+
+    function updateStats() {
+      const value = input.value;
+
+      charCount.textContent = value.length;
+
+      lineCount.textContent =
+        value.length === 0 ? 0 : value.split("\n").length;
+
+      if (!value.trim()) {
+        jsonStatus.textContent = "Empty";
+        return;
+      }
+
+      try {
+        JSON.parse(value);
+        jsonStatus.textContent = "Valid";
+      } catch {
+        jsonStatus.textContent = "Invalid";
+      }
+    }
+
+    function showStatus(message, type) {
+      status.textContent = message;
+      status.className = "status " + type;
+    }
+
+    function formatJSON() {
+      const value = input.value.trim();
+
+      if (!value) {
+        showStatus("Please enter some JSON first.", "error");
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(value);
+
+        input.value = JSON.stringify(parsed, null, 2);
+
+        showStatus("✓ JSON is valid and has been formatted.", "success");
+
+        updateStats();
+      } catch (error) {
+        showStatus(
+          "✕ Invalid JSON: " + error.message,
+          "error"
+        );
+
+        updateStats();
+      }
+    }
+
+    function minifyJSON() {
+      const value = input.value.trim();
+
+      if (!value) {
+        showStatus("Please enter some JSON first.", "error");
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(value);
+
+        input.value = JSON.stringify(parsed);
+
+        showStatus("✓ JSON has been minified successfully.", "success");
+
+        updateStats();
+      } catch (error) {
+        showStatus(
+          "✕ Invalid JSON: " + error.message,
+          "error"
+        );
+
+        updateStats();
+      }
+    }
+
+    function validateJSON() {
+      const value = input.value.trim();
+
+      if (!value) {
+        showStatus("Nothing to validate.", "error");
+        return;
+      }
+
+      try {
+        JSON.parse(value);
+
+        showStatus("✓ Valid JSON. No syntax errors found.", "success");
+      } catch (error) {
+        showStatus(
+          "✕ Invalid JSON: " + error.message,
+          "error"
+        );
+      }
+
+      updateStats();
+    }
+
+    async function copyJSON() {
+      const value = input.value;
+
+      if (!value) {
+        showStatus("Nothing to copy.", "error");
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(value);
+
+        showStatus("✓ JSON copied to clipboard.", "success");
+      } catch {
+        input.select();
+        document.execCommand("copy");
+
+        showStatus("✓ JSON copied to clipboard.", "success");
+      }
+    }
+
+    function clearJSON() {
+      input.value = "";
+
+      status.className = "status";
+
+      updateStats();
+      input.focus();
+    }
+    input.addEventListener("input", updateStats);
+    updateStats();
+  </script>
+</body>
+
+</html>
